@@ -2,32 +2,43 @@
 
 Flödet öppnar sin egen HTTP- och WebSocket-lyssnare (`/val/*` och `/val/ws`)
 via kärnnoderna `http in`, `http response`, `websocket in`/`websocket out` –
-du behöver **inte** konfigurera någon extern statisk filserver. Du behöver
-dock göra **en liten, obligatorisk ändring i `settings.js`** (steg 0 nedan)
-eftersom Function-nodens sandbox inte har tillgång till Node.js
-kärnmoduler (`fs`, `path`) eller `require()` som standard.
+du behöver **inte** konfigurera någon extern statisk filserver. Function-nodens
+sandbox har dock inte tillgång till Node.js kärnmoduler (`fs`, `path`) eller
+`require()` som standard, så de två noder som behöver filsystemet (`Global
+konfiguration + hjälpfunktioner` och `Servera statisk fil`) laddar `fs` och
+`path` via Function-nodens egen **"Setup"-flik** – det är redan förifyllt i
+`flows-val.json` (nodernas `libs`-fält), du behöver inte fylla i något
+manuellt i editorn.
+
+Detta kräver dock **ett engångsflagg i `settings.js`** (steg 0 nedan) – det
+är Node-RED:s inbyggda, avsedda mekanism för att en Function-nod ska få
+ladda moduler via Setup-fliken, och kräver ingen egen `require()`-kod från
+dig, bara att funktionen är påslagen.
 
 Kräver **Node.js 18 eller senare** (för global `fetch()` i funktionsnoderna
 – se avsnittet [Om Node.js-versionen är äldre](#om-nodejs-versionen-är-äldre-än-18)
 om det inte stämmer på din server).
 
-## 0. Ge funktionsnoderna tillgång till `fs`/`path` (obligatoriskt)
+## 0. Slå på `functionExternalModules` (obligatoriskt)
 
 Öppna din Node-RED `settings.js` (vanligen `~/.node-red/settings.js`) och
-lägg till (eller utöka om `functionGlobalContext` redan finns):
+lägg till:
 
 ```js
-functionGlobalContext: {
-    fs: require('fs'),
-    path: require('path')
-}
+functionExternalModules: true,
 ```
 
 **Starta om Node-RED-processen** (t.ex. `sudo systemctl restart nodered`,
 eller motsvarande för hur du kör den) – det räcker **inte** med Deploy i
 editorn, `settings.js` läses bara in vid processstart. Utan detta steg
-kraschar noden "Global konfiguration + hjälpfunktioner" med
-`ReferenceError: require is not defined`.
+vägrar Node-RED ladda modulerna som noderna "Global konfiguration +
+hjälpfunktioner" och "Servera statisk fil" begär via sin Setup-flik, och du
+får ett fel i stil med att `fs`/`path` inte är definierade.
+
+Om du vill se/ändra det i editorn istället för att lita på det importerade
+flödet: öppna någon av de två noderna → fliken **Setup** → där listas redan
+modulen `fs` importerad som `fs` (och `path` som `path`) – det är exakt
+samma sak som ligger i `libs`-fältet i flows-val.json.
 
 ## 1. Kopiera filer till servern
 
