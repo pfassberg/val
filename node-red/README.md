@@ -65,15 +65,23 @@ id-krockar). Du får två nya flikar:
 ## 3. Ställ in sökvägarna
 
 Öppna funktionsnoden **"Global konfiguration + hjälpfunktioner"** (flik
-*Val – realtid*, längst upp till vänster) och ändra de två konstanterna
+*Val – realtid*, längst upp till vänster) och ändra de tre konstanterna
 högst upp:
 
 ```js
 const DATA_DIR = "/opt/nodered/val/data";
 const WEB_ROOT = "/opt/nodered/val/web/val";
+const CACHE_DIR = "/tmp/val-cache";
 ```
 
-till de sökvägar du valde i steg 1.
+`DATA_DIR` och `WEB_ROOT` ska peka på sökvägarna du valde i steg 1 – de
+behöver bara vara **läsbara** för Node-RED-processen. `CACHE_DIR` måste
+däremot vara **skrivbar** (Node-RED laddar ner och cachar val.se-filer där);
+`/tmp/val-cache` funkar i de flesta miljöer, men om din server/container
+begränsar var processen får skriva (t.ex. nekar `/opt`), byt till en
+sökväg du vet är skrivbar. Cachen är bara en optimering – om katalogen
+töms vid omstart byggs den bara upp på nytt vid nästa hämtning, så det gör
+inget om den ligger under `/tmp`.
 
 ## 4. Deploy
 
