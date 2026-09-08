@@ -32,11 +32,37 @@
     meta: null,
     featuresByKod: new Map(), // kod -> { layer, properties }
     listOnlyByKod: new Map(), // kod -> properties
+    partyInfo: new Map(), // partikod -> { farg, namn } - insamlat från själva resultatdatan
     selectedKod: null,
     sortKey: "namn",
     sortDir: 1,
     filterText: ""
   };
+
+  // val.se skickar med officiell partifärg (fargkod) och fullständigt
+  // partinamn (partibeteckning) direkt i varje distrikts röstfördelning -
+  // vi använder alltid det i första hand. PartyColors (api/partier +
+  // hashfärg) är bara en reservlösning för partier utan egen färg i datan
+  // (t.ex. mindre lokala partier).
+  function registerPartyInfo(props) {
+    for (const p of props.roster || []) {
+      const existing = state.partyInfo.get(p.parti) || {};
+      state.partyInfo.set(p.parti, {
+        farg: p.farg || existing.farg,
+        namn: p.partiNamn || existing.namn
+      });
+    }
+  }
+  function partyColor(kod) {
+    const info = state.partyInfo.get(kod);
+    if (info && info.farg) return info.farg;
+    return PartyColors.color(kod);
+  }
+  function partyName(kod) {
+    const info = state.partyInfo.get(kod);
+    if (info && info.namn) return info.namn;
+    return PartyColors.name(kod);
+  }
 
   const map = L.map("map", { zoomControl: true }).setView([62.0, 15.0], 5);
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -98,7 +124,7 @@
   }
   function styleForProps(props) {
     return {
-      fillColor: PartyColors.color(props.ledandeParti),
+      fillColor: partyColor(props.ledandeParti),
       fillOpacity: fillOpacityFor(),
       color: props.partibyte ? "#222" : "#ffffff",
       weight: props.partibyte ? 3 : 1
@@ -129,17 +155,15 @@
       .map((p) => {
         return (
           "<tr><td><span class=\"chip\" style=\"background:" +
-          PartyColors.color(p.parti) +
+          partyColor(p.parti) +
           '"></span>' +
-          PartyColors.name(p.parti) +
+          partyName(p.parti) +
           "</td><td>" +
           (p.röster ?? "–") +
           "</td><td>" +
           fmtPct(p.andel) +
           "</td><td>" +
           fmtDelta(p.forandring) +
-          "</td><td>" +
-          (p.mandat ?? "–") +
           "</td></tr>"
         );
       })
@@ -168,7 +192,7 @@
       "</div>" +
       warn +
       noGeo +
-      '<table><thead><tr><th>Parti</th><th>Röster</th><th>Andel</th><th>Förändring</th><th>Mandat</th></tr></thead><tbody>' +
+      '<table><thead><tr><th>Parti</th><th>Röster</th><th>Andel</th><th>Förändring</th></tr></thead><tbody>' +
       rows +
       "</tbody></table>"
     );
@@ -183,6 +207,10 @@
   function renderGeoJson(geojson, isFirstLoad) {
     if (geoLayer) map.removeLayer(geoLayer);
     state.featuresByKod.clear();
+
+    // Måste ske INNAN L.geoJSON(...) konstrueras, eftersom dess style-callback
+    // (styleForProps -> partyColor) körs redan under konstruktionen.
+    for (const f of geojson.features) registerPartyInfo(f.properties);
 
     geoLayer = L.geoJSON(geojson, {
       style: (f) => styleForProps(f.properties),
@@ -218,9 +246,9 @@
       .map(
         ([parti, n]) =>
           '<div><span class="chip" style="background:' +
-          PartyColors.color(parti) +
+          partyColor(parti) +
           '"></span>' +
-          PartyColors.name(parti) +
+          partyName(parti) +
           " (" +
           n +
           ")</div>"
@@ -269,9 +297,9 @@
         flipTag +
         noGeoTag +
         "</td><td><span class=\"chip\" style=\"background:" +
-        PartyColors.color(props.ledandeParti) +
+        partyColor(props.ledandeParti) +
         '"></span>' +
-        PartyColors.name(props.ledandeParti) +
+        partyName(props.ledandeParti) +
         "</td><td>" +
         fmtPct(props.valdeltagande) +
         "</td>";
@@ -347,7 +375,10 @@
           return;
         }
         state.meta = data.meta;
-        for (const props of data.uppsamlingsdistrikt || []) state.listOnlyByKod.set(props.kod, props);
+        for (const props of data.uppsamlingsdistrikt || []) {
+          registerPartyInfo(props);
+          state.listOnlyByKod.set(props.kod, props);
+        }
         updateHeader();
         PartyColors.ready.then(() => {
           renderGeoJson(data.geojson, true);
@@ -368,6 +399,7 @@
     let changed = false;
     for (const props of msg.distrikt || []) {
       changed = true;
+      registerPartyInfo(props);
       const entry = state.featuresByKod.get(props.kod);
       if (entry) {
         entry.properties = props;
@@ -381,6 +413,7 @@
     }
     for (const props of msg.uppsamlingsdistrikt || []) {
       changed = true;
+      registerPartyInfo(props);
       state.listOnlyByKod.set(props.kod, props);
       flashRow(props.kod);
       if (props.kod === state.selectedKod) els.detail.innerHTML = buildDetailHtml(props);

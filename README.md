@@ -38,26 +38,18 @@ Innehåll i detta repo:
 
 ## ⚠️ Viktigt att veta innan du testar
 
-Det här är en fullt fungerande arkitektur, men **den exakta URL-strukturen
-för val.se:s rådatafiler har inte kunnat verifieras automatiskt** – val.se
-var blockerat från nätverket i den miljö där koden skrevs. Allt annat
-(kartan, listan, WebSocket-pushen, jämförelselogiken, API:et) är byggt och
-klart.
+**Röster, mandat och jämförelselogiken är verifierade mot en riktig fil**
+från val.se (kommunval Trollhättan 2022 – `Val_20220911_preliminar_1488_KF.zip`)
+och fungerar redan. URL-strukturen för resultatfilerna
+(`https://resultat.val.se/resultatfiler/val{ÅR}/{p|s}/{kf|rf|rd}/...zip`)
+är inbyggd i `valHelpers.resultatUrl()`.
 
-Det enda du **behöver göra själv** innan riktiga siffror visas är att öppna
-en verklig fil från val.se (tar ~5 minuter) och uppdatera:
-
-1. Två URL-mallar i `node-red/flows-val.json` → funktionsnoden **"Global
-   konfiguration + hjälpfunktioner"** (`urls.geo` och `urls.resultat`).
-2. Vid behov, fältnamnen i funktionsnoden **"Hämta, normalisera och
-   jämför"** (i subflowet `HamtaValdata`) – koden letar redan efter flera
-   troliga svenska fältnamnsvarianter, och om den inte hittar rätt fält
-   kastar den ett tydligt fel som listar de *faktiska* fältnamnen i
-   svaret, så du direkt ser vad som ska läggas till.
-
-Fullständig steg-för-steg-guide finns i [node-red/README.md](node-red/README.md#verifiera-valse-urler).
-Tills dess kommer `/val/api/valdistrikt` att svara med ett tydligt
-felmeddelande (HTTP 502) istället för att krascha eller visa påhittad data.
+Det som **fortfarande saknas** är geometrin (valdistriktens kartutbredning) –
+den ligger inte i resultatfilerna, och `urls.geo` i `node-red/flows-val.json`
+→ funktionsnoden **"Global konfiguration + hjälpfunktioner"** är fortfarande
+en placeholder. Utan den visas listan (med alla riktiga siffror) men ingen
+karta. Steg-för-steg för hur du hittar och fyller i den finns i
+[node-red/README.md](node-red/README.md#5-resultat-urlerna-är-verifierade--geometrin-kartan-återstår).
 
 ## Funktioner
 
