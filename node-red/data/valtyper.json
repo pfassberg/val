@@ -1,0 +1,20 @@
+[
+  {
+    "id": "riksdag",
+    "namn": "Riksdagsval",
+    "niva": "riksdag",
+    "beskrivning": "Val till Sveriges riksdag. Mandaten fördelas per valkrets (oftast ett län), men röster räknas per valdistrikt."
+  },
+  {
+    "id": "region",
+    "namn": "Regionval",
+    "niva": "region",
+    "beskrivning": "Val till regionfullmäktige (tidigare landstingsfullmäktige)."
+  },
+  {
+    "id": "kommun",
+    "namn": "Kommunval",
+    "niva": "kommun",
+    "beskrivning": "Val till kommunfullmäktige. Kan innehålla lokala partier utan riksdagsrepresentation."
+  }
+]

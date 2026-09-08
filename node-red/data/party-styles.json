@@ -1,0 +1,14 @@
+{
+  "_comment": "Färger är en pragmatisk, tydligt urskiljbar palett – inte officiella partilogotypfärger. Justera gärna hex-koderna om ni vill matcha en annan grafisk profil. Partier som inte finns här (t.ex. lokala kommunpartier) får en stabil färg genererad från partiets bokstavskod, se web/val/js/partycolors.js.",
+  "partier": {
+    "S":   { "namn": "Socialdemokraterna",  "farg": "#E8112D" },
+    "M":   { "namn": "Moderaterna",          "farg": "#1B4F9C" },
+    "SD":  { "namn": "Sverigedemokraterna",  "farg": "#DDDD00" },
+    "C":   { "namn": "Centerpartiet",        "farg": "#00933C" },
+    "V":   { "namn": "Vänsterpartiet",       "farg": "#8B0000" },
+    "KD":  { "namn": "Kristdemokraterna",    "farg": "#154889" },
+    "L":   { "namn": "Liberalerna",          "farg": "#4FBBEE" },
+    "MP":  { "namn": "Miljöpartiet",         "farg": "#83CF39" },
+    "OVR": { "namn": "Övriga/lokala partier","farg": "#9E9E9E" }
+  }
+}

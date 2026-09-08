@@ -1,0 +1,1742 @@
+[
+  {
+    "kod": "0114",
+    "namn": "Upplands Väsby",
+    "lan_kod": "01",
+    "lan_namn": "Stockholms län"
+  },
+  {
+    "kod": "0115",
+    "namn": "Vallentuna",
+    "lan_kod": "01",
+    "lan_namn": "Stockholms län"
+  },
+  {
+    "kod": "0117",
+    "namn": "Österåker",
+    "lan_kod": "01",
+    "lan_namn": "Stockholms län"
+  },
+  {
+    "kod": "0120",
+    "namn": "Värmdö",
+    "lan_kod": "01",
+    "lan_namn": "Stockholms län"
+  },
+  {
+    "kod": "0123",
+    "namn": "Järfälla",
+    "lan_kod": "01",
+    "lan_namn": "Stockholms län"
+  },
+  {
+    "kod": "0125",
+    "namn": "Ekerö",
+    "lan_kod": "01",
+    "lan_namn": "Stockholms län"
+  },
+  {
+    "kod": "0126",
+    "namn": "Huddinge",
+    "lan_kod": "01",
+    "lan_namn": "Stockholms län"
+  },
+  {
+    "kod": "0127",
+    "namn": "Botkyrka",
+    "lan_kod": "01",
+    "lan_namn": "Stockholms län"
+  },
+  {
+    "kod": "0128",
+    "namn": "Salem",
+    "lan_kod": "01",
+    "lan_namn": "Stockholms län"
+  },
+  {
+    "kod": "0136",
+    "namn": "Haninge",
+    "lan_kod": "01",
+    "lan_namn": "Stockholms län"
+  },
+  {
+    "kod": "0138",
+    "namn": "Tyresö",
+    "lan_kod": "01",
+    "lan_namn": "Stockholms län"
+  },
+  {
+    "kod": "0139",
+    "namn": "Upplands-Bro",
+    "lan_kod": "01",
+    "lan_namn": "Stockholms län"
+  },
+  {
+    "kod": "0140",
+    "namn": "Nykvarn",
+    "lan_kod": "01",
+    "lan_namn": "Stockholms län"
+  },
+  {
+    "kod": "0160",
+    "namn": "Täby",
+    "lan_kod": "01",
+    "lan_namn": "Stockholms län"
+  },
+  {
+    "kod": "0162",
+    "namn": "Danderyd",
+    "lan_kod": "01",
+    "lan_namn": "Stockholms län"
+  },
+  {
+    "kod": "0163",
+    "namn": "Sollentuna",
+    "lan_kod": "01",
+    "lan_namn": "Stockholms län"
+  },
+  {
+    "kod": "0180",
+    "namn": "Stockholm",
+    "lan_kod": "01",
+    "lan_namn": "Stockholms län"
+  },
+  {
+    "kod": "0181",
+    "namn": "Södertälje",
+    "lan_kod": "01",
+    "lan_namn": "Stockholms län"
+  },
+  {
+    "kod": "0182",
+    "namn": "Nacka",
+    "lan_kod": "01",
+    "lan_namn": "Stockholms län"
+  },
+  {
+    "kod": "0183",
+    "namn": "Sundbyberg",
+    "lan_kod": "01",
+    "lan_namn": "Stockholms län"
+  },
+  {
+    "kod": "0184",
+    "namn": "Solna",
+    "lan_kod": "01",
+    "lan_namn": "Stockholms län"
+  },
+  {
+    "kod": "0186",
+    "namn": "Lidingö",
+    "lan_kod": "01",
+    "lan_namn": "Stockholms län"
+  },
+  {
+    "kod": "0187",
+    "namn": "Vaxholm",
+    "lan_kod": "01",
+    "lan_namn": "Stockholms län"
+  },
+  {
+    "kod": "0188",
+    "namn": "Norrtälje",
+    "lan_kod": "01",
+    "lan_namn": "Stockholms län"
+  },
+  {
+    "kod": "0191",
+    "namn": "Sigtuna",
+    "lan_kod": "01",
+    "lan_namn": "Stockholms län"
+  },
+  {
+    "kod": "0192",
+    "namn": "Nynäshamn",
+    "lan_kod": "01",
+    "lan_namn": "Stockholms län"
+  },
+  {
+    "kod": "0305",
+    "namn": "Håbo",
+    "lan_kod": "03",
+    "lan_namn": "Uppsala län"
+  },
+  {
+    "kod": "0319",
+    "namn": "Älvkarleby",
+    "lan_kod": "03",
+    "lan_namn": "Uppsala län"
+  },
+  {
+    "kod": "0330",
+    "namn": "Knivsta",
+    "lan_kod": "03",
+    "lan_namn": "Uppsala län"
+  },
+  {
+    "kod": "0331",
+    "namn": "Heby",
+    "lan_kod": "03",
+    "lan_namn": "Uppsala län"
+  },
+  {
+    "kod": "0360",
+    "namn": "Tierp",
+    "lan_kod": "03",
+    "lan_namn": "Uppsala län"
+  },
+  {
+    "kod": "0380",
+    "namn": "Uppsala",
+    "lan_kod": "03",
+    "lan_namn": "Uppsala län"
+  },
+  {
+    "kod": "0381",
+    "namn": "Enköping",
+    "lan_kod": "03",
+    "lan_namn": "Uppsala län"
+  },
+  {
+    "kod": "0382",
+    "namn": "Östhammar",
+    "lan_kod": "03",
+    "lan_namn": "Uppsala län"
+  },
+  {
+    "kod": "0428",
+    "namn": "Vingåker",
+    "lan_kod": "04",
+    "lan_namn": "Södermanlands län"
+  },
+  {
+    "kod": "0461",
+    "namn": "Gnesta",
+    "lan_kod": "04",
+    "lan_namn": "Södermanlands län"
+  },
+  {
+    "kod": "0480",
+    "namn": "Nyköping",
+    "lan_kod": "04",
+    "lan_namn": "Södermanlands län"
+  },
+  {
+    "kod": "0481",
+    "namn": "Oxelösund",
+    "lan_kod": "04",
+    "lan_namn": "Södermanlands län"
+  },
+  {
+    "kod": "0482",
+    "namn": "Flen",
+    "lan_kod": "04",
+    "lan_namn": "Södermanlands län"
+  },
+  {
+    "kod": "0483",
+    "namn": "Katrineholm",
+    "lan_kod": "04",
+    "lan_namn": "Södermanlands län"
+  },
+  {
+    "kod": "0484",
+    "namn": "Eskilstuna",
+    "lan_kod": "04",
+    "lan_namn": "Södermanlands län"
+  },
+  {
+    "kod": "0486",
+    "namn": "Strängnäs",
+    "lan_kod": "04",
+    "lan_namn": "Södermanlands län"
+  },
+  {
+    "kod": "0488",
+    "namn": "Trosa",
+    "lan_kod": "04",
+    "lan_namn": "Södermanlands län"
+  },
+  {
+    "kod": "0509",
+    "namn": "Ödeshög",
+    "lan_kod": "05",
+    "lan_namn": "Östergötlands län"
+  },
+  {
+    "kod": "0512",
+    "namn": "Ydre",
+    "lan_kod": "05",
+    "lan_namn": "Östergötlands län"
+  },
+  {
+    "kod": "0513",
+    "namn": "Kinda",
+    "lan_kod": "05",
+    "lan_namn": "Östergötlands län"
+  },
+  {
+    "kod": "0560",
+    "namn": "Boxholm",
+    "lan_kod": "05",
+    "lan_namn": "Östergötlands län"
+  },
+  {
+    "kod": "0561",
+    "namn": "Åtvidaberg",
+    "lan_kod": "05",
+    "lan_namn": "Östergötlands län"
+  },
+  {
+    "kod": "0562",
+    "namn": "Finspång",
+    "lan_kod": "05",
+    "lan_namn": "Östergötlands län"
+  },
+  {
+    "kod": "0563",
+    "namn": "Valdemarsvik",
+    "lan_kod": "05",
+    "lan_namn": "Östergötlands län"
+  },
+  {
+    "kod": "0580",
+    "namn": "Linköping",
+    "lan_kod": "05",
+    "lan_namn": "Östergötlands län"
+  },
+  {
+    "kod": "0581",
+    "namn": "Norrköping",
+    "lan_kod": "05",
+    "lan_namn": "Östergötlands län"
+  },
+  {
+    "kod": "0582",
+    "namn": "Söderköping",
+    "lan_kod": "05",
+    "lan_namn": "Östergötlands län"
+  },
+  {
+    "kod": "0583",
+    "namn": "Motala",
+    "lan_kod": "05",
+    "lan_namn": "Östergötlands län"
+  },
+  {
+    "kod": "0584",
+    "namn": "Vadstena",
+    "lan_kod": "05",
+    "lan_namn": "Östergötlands län"
+  },
+  {
+    "kod": "0586",
+    "namn": "Mjölby",
+    "lan_kod": "05",
+    "lan_namn": "Östergötlands län"
+  },
+  {
+    "kod": "0604",
+    "namn": "Aneby",
+    "lan_kod": "06",
+    "lan_namn": "Jönköpings län"
+  },
+  {
+    "kod": "0617",
+    "namn": "Gnosjö",
+    "lan_kod": "06",
+    "lan_namn": "Jönköpings län"
+  },
+  {
+    "kod": "0642",
+    "namn": "Mullsjö",
+    "lan_kod": "06",
+    "lan_namn": "Jönköpings län"
+  },
+  {
+    "kod": "0643",
+    "namn": "Habo",
+    "lan_kod": "06",
+    "lan_namn": "Jönköpings län"
+  },
+  {
+    "kod": "0662",
+    "namn": "Gislaved",
+    "lan_kod": "06",
+    "lan_namn": "Jönköpings län"
+  },
+  {
+    "kod": "0665",
+    "namn": "Vaggeryd",
+    "lan_kod": "06",
+    "lan_namn": "Jönköpings län"
+  },
+  {
+    "kod": "0680",
+    "namn": "Jönköping",
+    "lan_kod": "06",
+    "lan_namn": "Jönköpings län"
+  },
+  {
+    "kod": "0682",
+    "namn": "Nässjö",
+    "lan_kod": "06",
+    "lan_namn": "Jönköpings län"
+  },
+  {
+    "kod": "0683",
+    "namn": "Värnamo",
+    "lan_kod": "06",
+    "lan_namn": "Jönköpings län"
+  },
+  {
+    "kod": "0684",
+    "namn": "Sävsjö",
+    "lan_kod": "06",
+    "lan_namn": "Jönköpings län"
+  },
+  {
+    "kod": "0685",
+    "namn": "Vetlanda",
+    "lan_kod": "06",
+    "lan_namn": "Jönköpings län"
+  },
+  {
+    "kod": "0686",
+    "namn": "Eksjö",
+    "lan_kod": "06",
+    "lan_namn": "Jönköpings län"
+  },
+  {
+    "kod": "0687",
+    "namn": "Tranås",
+    "lan_kod": "06",
+    "lan_namn": "Jönköpings län"
+  },
+  {
+    "kod": "0760",
+    "namn": "Uppvidinge",
+    "lan_kod": "07",
+    "lan_namn": "Kronobergs län"
+  },
+  {
+    "kod": "0761",
+    "namn": "Lessebo",
+    "lan_kod": "07",
+    "lan_namn": "Kronobergs län"
+  },
+  {
+    "kod": "0763",
+    "namn": "Tingsryd",
+    "lan_kod": "07",
+    "lan_namn": "Kronobergs län"
+  },
+  {
+    "kod": "0764",
+    "namn": "Alvesta",
+    "lan_kod": "07",
+    "lan_namn": "Kronobergs län"
+  },
+  {
+    "kod": "0765",
+    "namn": "Älmhult",
+    "lan_kod": "07",
+    "lan_namn": "Kronobergs län"
+  },
+  {
+    "kod": "0767",
+    "namn": "Markaryd",
+    "lan_kod": "07",
+    "lan_namn": "Kronobergs län"
+  },
+  {
+    "kod": "0780",
+    "namn": "Växjö",
+    "lan_kod": "07",
+    "lan_namn": "Kronobergs län"
+  },
+  {
+    "kod": "0781",
+    "namn": "Ljungby",
+    "lan_kod": "07",
+    "lan_namn": "Kronobergs län"
+  },
+  {
+    "kod": "0821",
+    "namn": "Högsby",
+    "lan_kod": "08",
+    "lan_namn": "Kalmar län"
+  },
+  {
+    "kod": "0834",
+    "namn": "Torsås",
+    "lan_kod": "08",
+    "lan_namn": "Kalmar län"
+  },
+  {
+    "kod": "0840",
+    "namn": "Mörbylånga",
+    "lan_kod": "08",
+    "lan_namn": "Kalmar län"
+  },
+  {
+    "kod": "0860",
+    "namn": "Hultsfred",
+    "lan_kod": "08",
+    "lan_namn": "Kalmar län"
+  },
+  {
+    "kod": "0861",
+    "namn": "Mönsterås",
+    "lan_kod": "08",
+    "lan_namn": "Kalmar län"
+  },
+  {
+    "kod": "0862",
+    "namn": "Emmaboda",
+    "lan_kod": "08",
+    "lan_namn": "Kalmar län"
+  },
+  {
+    "kod": "0880",
+    "namn": "Kalmar",
+    "lan_kod": "08",
+    "lan_namn": "Kalmar län"
+  },
+  {
+    "kod": "0881",
+    "namn": "Nybro",
+    "lan_kod": "08",
+    "lan_namn": "Kalmar län"
+  },
+  {
+    "kod": "0882",
+    "namn": "Oskarshamn",
+    "lan_kod": "08",
+    "lan_namn": "Kalmar län"
+  },
+  {
+    "kod": "0883",
+    "namn": "Västervik",
+    "lan_kod": "08",
+    "lan_namn": "Kalmar län"
+  },
+  {
+    "kod": "0884",
+    "namn": "Vimmerby",
+    "lan_kod": "08",
+    "lan_namn": "Kalmar län"
+  },
+  {
+    "kod": "0885",
+    "namn": "Borgholm",
+    "lan_kod": "08",
+    "lan_namn": "Kalmar län"
+  },
+  {
+    "kod": "0980",
+    "namn": "Gotland",
+    "lan_kod": "09",
+    "lan_namn": "Gotlands län"
+  },
+  {
+    "kod": "1060",
+    "namn": "Olofström",
+    "lan_kod": "10",
+    "lan_namn": "Blekinge län"
+  },
+  {
+    "kod": "1080",
+    "namn": "Karlskrona",
+    "lan_kod": "10",
+    "lan_namn": "Blekinge län"
+  },
+  {
+    "kod": "1081",
+    "namn": "Ronneby",
+    "lan_kod": "10",
+    "lan_namn": "Blekinge län"
+  },
+  {
+    "kod": "1082",
+    "namn": "Karlshamn",
+    "lan_kod": "10",
+    "lan_namn": "Blekinge län"
+  },
+  {
+    "kod": "1083",
+    "namn": "Sölvesborg",
+    "lan_kod": "10",
+    "lan_namn": "Blekinge län"
+  },
+  {
+    "kod": "1214",
+    "namn": "Svalöv",
+    "lan_kod": "12",
+    "lan_namn": "Skåne län"
+  },
+  {
+    "kod": "1230",
+    "namn": "Staffanstorp",
+    "lan_kod": "12",
+    "lan_namn": "Skåne län"
+  },
+  {
+    "kod": "1231",
+    "namn": "Burlöv",
+    "lan_kod": "12",
+    "lan_namn": "Skåne län"
+  },
+  {
+    "kod": "1233",
+    "namn": "Vellinge",
+    "lan_kod": "12",
+    "lan_namn": "Skåne län"
+  },
+  {
+    "kod": "1256",
+    "namn": "Östra Göinge",
+    "lan_kod": "12",
+    "lan_namn": "Skåne län"
+  },
+  {
+    "kod": "1257",
+    "namn": "Örkelljunga",
+    "lan_kod": "12",
+    "lan_namn": "Skåne län"
+  },
+  {
+    "kod": "1260",
+    "namn": "Bjuv",
+    "lan_kod": "12",
+    "lan_namn": "Skåne län"
+  },
+  {
+    "kod": "1261",
+    "namn": "Kävlinge",
+    "lan_kod": "12",
+    "lan_namn": "Skåne län"
+  },
+  {
+    "kod": "1262",
+    "namn": "Lomma",
+    "lan_kod": "12",
+    "lan_namn": "Skåne län"
+  },
+  {
+    "kod": "1263",
+    "namn": "Svedala",
+    "lan_kod": "12",
+    "lan_namn": "Skåne län"
+  },
+  {
+    "kod": "1264",
+    "namn": "Skurup",
+    "lan_kod": "12",
+    "lan_namn": "Skåne län"
+  },
+  {
+    "kod": "1265",
+    "namn": "Sjöbo",
+    "lan_kod": "12",
+    "lan_namn": "Skåne län"
+  },
+  {
+    "kod": "1266",
+    "namn": "Hörby",
+    "lan_kod": "12",
+    "lan_namn": "Skåne län"
+  },
+  {
+    "kod": "1267",
+    "namn": "Höör",
+    "lan_kod": "12",
+    "lan_namn": "Skåne län"
+  },
+  {
+    "kod": "1270",
+    "namn": "Tomelilla",
+    "lan_kod": "12",
+    "lan_namn": "Skåne län"
+  },
+  {
+    "kod": "1272",
+    "namn": "Bromölla",
+    "lan_kod": "12",
+    "lan_namn": "Skåne län"
+  },
+  {
+    "kod": "1273",
+    "namn": "Osby",
+    "lan_kod": "12",
+    "lan_namn": "Skåne län"
+  },
+  {
+    "kod": "1275",
+    "namn": "Perstorp",
+    "lan_kod": "12",
+    "lan_namn": "Skåne län"
+  },
+  {
+    "kod": "1276",
+    "namn": "Klippan",
+    "lan_kod": "12",
+    "lan_namn": "Skåne län"
+  },
+  {
+    "kod": "1277",
+    "namn": "Åstorp",
+    "lan_kod": "12",
+    "lan_namn": "Skåne län"
+  },
+  {
+    "kod": "1278",
+    "namn": "Båstad",
+    "lan_kod": "12",
+    "lan_namn": "Skåne län"
+  },
+  {
+    "kod": "1280",
+    "namn": "Malmö",
+    "lan_kod": "12",
+    "lan_namn": "Skåne län"
+  },
+  {
+    "kod": "1281",
+    "namn": "Lund",
+    "lan_kod": "12",
+    "lan_namn": "Skåne län"
+  },
+  {
+    "kod": "1282",
+    "namn": "Landskrona",
+    "lan_kod": "12",
+    "lan_namn": "Skåne län"
+  },
+  {
+    "kod": "1283",
+    "namn": "Helsingborg",
+    "lan_kod": "12",
+    "lan_namn": "Skåne län"
+  },
+  {
+    "kod": "1284",
+    "namn": "Höganäs",
+    "lan_kod": "12",
+    "lan_namn": "Skåne län"
+  },
+  {
+    "kod": "1285",
+    "namn": "Eslöv",
+    "lan_kod": "12",
+    "lan_namn": "Skåne län"
+  },
+  {
+    "kod": "1286",
+    "namn": "Ystad",
+    "lan_kod": "12",
+    "lan_namn": "Skåne län"
+  },
+  {
+    "kod": "1287",
+    "namn": "Trelleborg",
+    "lan_kod": "12",
+    "lan_namn": "Skåne län"
+  },
+  {
+    "kod": "1290",
+    "namn": "Kristianstad",
+    "lan_kod": "12",
+    "lan_namn": "Skåne län"
+  },
+  {
+    "kod": "1291",
+    "namn": "Simrishamn",
+    "lan_kod": "12",
+    "lan_namn": "Skåne län"
+  },
+  {
+    "kod": "1292",
+    "namn": "Ängelholm",
+    "lan_kod": "12",
+    "lan_namn": "Skåne län"
+  },
+  {
+    "kod": "1293",
+    "namn": "Hässleholm",
+    "lan_kod": "12",
+    "lan_namn": "Skåne län"
+  },
+  {
+    "kod": "1315",
+    "namn": "Hylte",
+    "lan_kod": "13",
+    "lan_namn": "Hallands län"
+  },
+  {
+    "kod": "1380",
+    "namn": "Halmstad",
+    "lan_kod": "13",
+    "lan_namn": "Hallands län"
+  },
+  {
+    "kod": "1381",
+    "namn": "Laholm",
+    "lan_kod": "13",
+    "lan_namn": "Hallands län"
+  },
+  {
+    "kod": "1382",
+    "namn": "Falkenberg",
+    "lan_kod": "13",
+    "lan_namn": "Hallands län"
+  },
+  {
+    "kod": "1383",
+    "namn": "Varberg",
+    "lan_kod": "13",
+    "lan_namn": "Hallands län"
+  },
+  {
+    "kod": "1384",
+    "namn": "Kungsbacka",
+    "lan_kod": "13",
+    "lan_namn": "Hallands län"
+  },
+  {
+    "kod": "1401",
+    "namn": "Härryda",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1402",
+    "namn": "Partille",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1407",
+    "namn": "Öckerö",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1415",
+    "namn": "Stenungsund",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1419",
+    "namn": "Tjörn",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1421",
+    "namn": "Orust",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1427",
+    "namn": "Sotenäs",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1430",
+    "namn": "Munkedal",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1435",
+    "namn": "Tanum",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1438",
+    "namn": "Dals-Ed",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1439",
+    "namn": "Färgelanda",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1440",
+    "namn": "Ale",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1441",
+    "namn": "Lerum",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1442",
+    "namn": "Vårgårda",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1443",
+    "namn": "Bollebygd",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1444",
+    "namn": "Grästorp",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1445",
+    "namn": "Essunga",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1446",
+    "namn": "Karlsborg",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1447",
+    "namn": "Gullspång",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1452",
+    "namn": "Tranemo",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1460",
+    "namn": "Bengtsfors",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1461",
+    "namn": "Mellerud",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1462",
+    "namn": "Lilla Edet",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1463",
+    "namn": "Mark",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1465",
+    "namn": "Svenljunga",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1466",
+    "namn": "Herrljunga",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1470",
+    "namn": "Vara",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1471",
+    "namn": "Götene",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1472",
+    "namn": "Tibro",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1473",
+    "namn": "Töreboda",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1480",
+    "namn": "Göteborg",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1481",
+    "namn": "Mölndal",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1482",
+    "namn": "Kungälv",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1484",
+    "namn": "Lysekil",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1485",
+    "namn": "Uddevalla",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1486",
+    "namn": "Strömstad",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1487",
+    "namn": "Vänersborg",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1488",
+    "namn": "Trollhättan",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1489",
+    "namn": "Alingsås",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1490",
+    "namn": "Borås",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1491",
+    "namn": "Ulricehamn",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1492",
+    "namn": "Åmål",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1493",
+    "namn": "Mariestad",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1494",
+    "namn": "Lidköping",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1495",
+    "namn": "Skara",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1496",
+    "namn": "Skövde",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1497",
+    "namn": "Hjo",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1498",
+    "namn": "Tidaholm",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1499",
+    "namn": "Falköping",
+    "lan_kod": "14",
+    "lan_namn": "Västra Götalands län"
+  },
+  {
+    "kod": "1715",
+    "namn": "Kil",
+    "lan_kod": "17",
+    "lan_namn": "Värmlands län"
+  },
+  {
+    "kod": "1730",
+    "namn": "Eda",
+    "lan_kod": "17",
+    "lan_namn": "Värmlands län"
+  },
+  {
+    "kod": "1737",
+    "namn": "Torsby",
+    "lan_kod": "17",
+    "lan_namn": "Värmlands län"
+  },
+  {
+    "kod": "1760",
+    "namn": "Storfors",
+    "lan_kod": "17",
+    "lan_namn": "Värmlands län"
+  },
+  {
+    "kod": "1761",
+    "namn": "Hammarö",
+    "lan_kod": "17",
+    "lan_namn": "Värmlands län"
+  },
+  {
+    "kod": "1762",
+    "namn": "Munkfors",
+    "lan_kod": "17",
+    "lan_namn": "Värmlands län"
+  },
+  {
+    "kod": "1763",
+    "namn": "Forshaga",
+    "lan_kod": "17",
+    "lan_namn": "Värmlands län"
+  },
+  {
+    "kod": "1764",
+    "namn": "Grums",
+    "lan_kod": "17",
+    "lan_namn": "Värmlands län"
+  },
+  {
+    "kod": "1765",
+    "namn": "Årjäng",
+    "lan_kod": "17",
+    "lan_namn": "Värmlands län"
+  },
+  {
+    "kod": "1766",
+    "namn": "Sunne",
+    "lan_kod": "17",
+    "lan_namn": "Värmlands län"
+  },
+  {
+    "kod": "1780",
+    "namn": "Karlstad",
+    "lan_kod": "17",
+    "lan_namn": "Värmlands län"
+  },
+  {
+    "kod": "1781",
+    "namn": "Kristinehamn",
+    "lan_kod": "17",
+    "lan_namn": "Värmlands län"
+  },
+  {
+    "kod": "1782",
+    "namn": "Filipstad",
+    "lan_kod": "17",
+    "lan_namn": "Värmlands län"
+  },
+  {
+    "kod": "1783",
+    "namn": "Hagfors",
+    "lan_kod": "17",
+    "lan_namn": "Värmlands län"
+  },
+  {
+    "kod": "1784",
+    "namn": "Arvika",
+    "lan_kod": "17",
+    "lan_namn": "Värmlands län"
+  },
+  {
+    "kod": "1785",
+    "namn": "Säffle",
+    "lan_kod": "17",
+    "lan_namn": "Värmlands län"
+  },
+  {
+    "kod": "1814",
+    "namn": "Lekeberg",
+    "lan_kod": "18",
+    "lan_namn": "Örebro län"
+  },
+  {
+    "kod": "1860",
+    "namn": "Laxå",
+    "lan_kod": "18",
+    "lan_namn": "Örebro län"
+  },
+  {
+    "kod": "1861",
+    "namn": "Hallsberg",
+    "lan_kod": "18",
+    "lan_namn": "Örebro län"
+  },
+  {
+    "kod": "1862",
+    "namn": "Degerfors",
+    "lan_kod": "18",
+    "lan_namn": "Örebro län"
+  },
+  {
+    "kod": "1863",
+    "namn": "Hällefors",
+    "lan_kod": "18",
+    "lan_namn": "Örebro län"
+  },
+  {
+    "kod": "1864",
+    "namn": "Ljusnarsberg",
+    "lan_kod": "18",
+    "lan_namn": "Örebro län"
+  },
+  {
+    "kod": "1880",
+    "namn": "Örebro",
+    "lan_kod": "18",
+    "lan_namn": "Örebro län"
+  },
+  {
+    "kod": "1881",
+    "namn": "Kumla",
+    "lan_kod": "18",
+    "lan_namn": "Örebro län"
+  },
+  {
+    "kod": "1882",
+    "namn": "Askersund",
+    "lan_kod": "18",
+    "lan_namn": "Örebro län"
+  },
+  {
+    "kod": "1883",
+    "namn": "Karlskoga",
+    "lan_kod": "18",
+    "lan_namn": "Örebro län"
+  },
+  {
+    "kod": "1884",
+    "namn": "Nora",
+    "lan_kod": "18",
+    "lan_namn": "Örebro län"
+  },
+  {
+    "kod": "1885",
+    "namn": "Lindesberg",
+    "lan_kod": "18",
+    "lan_namn": "Örebro län"
+  },
+  {
+    "kod": "1904",
+    "namn": "Skinnskatteberg",
+    "lan_kod": "19",
+    "lan_namn": "Västmanlands län"
+  },
+  {
+    "kod": "1907",
+    "namn": "Surahammar",
+    "lan_kod": "19",
+    "lan_namn": "Västmanlands län"
+  },
+  {
+    "kod": "1960",
+    "namn": "Kungsör",
+    "lan_kod": "19",
+    "lan_namn": "Västmanlands län"
+  },
+  {
+    "kod": "1961",
+    "namn": "Hallstahammar",
+    "lan_kod": "19",
+    "lan_namn": "Västmanlands län"
+  },
+  {
+    "kod": "1962",
+    "namn": "Norberg",
+    "lan_kod": "19",
+    "lan_namn": "Västmanlands län"
+  },
+  {
+    "kod": "1980",
+    "namn": "Västerås",
+    "lan_kod": "19",
+    "lan_namn": "Västmanlands län"
+  },
+  {
+    "kod": "1981",
+    "namn": "Sala",
+    "lan_kod": "19",
+    "lan_namn": "Västmanlands län"
+  },
+  {
+    "kod": "1982",
+    "namn": "Fagersta",
+    "lan_kod": "19",
+    "lan_namn": "Västmanlands län"
+  },
+  {
+    "kod": "1983",
+    "namn": "Köping",
+    "lan_kod": "19",
+    "lan_namn": "Västmanlands län"
+  },
+  {
+    "kod": "1984",
+    "namn": "Arboga",
+    "lan_kod": "19",
+    "lan_namn": "Västmanlands län"
+  },
+  {
+    "kod": "2021",
+    "namn": "Vansbro",
+    "lan_kod": "20",
+    "lan_namn": "Dalarnas län"
+  },
+  {
+    "kod": "2023",
+    "namn": "Malung-Sälen",
+    "lan_kod": "20",
+    "lan_namn": "Dalarnas län"
+  },
+  {
+    "kod": "2026",
+    "namn": "Gagnef",
+    "lan_kod": "20",
+    "lan_namn": "Dalarnas län"
+  },
+  {
+    "kod": "2029",
+    "namn": "Leksand",
+    "lan_kod": "20",
+    "lan_namn": "Dalarnas län"
+  },
+  {
+    "kod": "2031",
+    "namn": "Rättvik",
+    "lan_kod": "20",
+    "lan_namn": "Dalarnas län"
+  },
+  {
+    "kod": "2034",
+    "namn": "Orsa",
+    "lan_kod": "20",
+    "lan_namn": "Dalarnas län"
+  },
+  {
+    "kod": "2039",
+    "namn": "Älvdalen",
+    "lan_kod": "20",
+    "lan_namn": "Dalarnas län"
+  },
+  {
+    "kod": "2061",
+    "namn": "Smedjebacken",
+    "lan_kod": "20",
+    "lan_namn": "Dalarnas län"
+  },
+  {
+    "kod": "2062",
+    "namn": "Mora",
+    "lan_kod": "20",
+    "lan_namn": "Dalarnas län"
+  },
+  {
+    "kod": "2080",
+    "namn": "Falun",
+    "lan_kod": "20",
+    "lan_namn": "Dalarnas län"
+  },
+  {
+    "kod": "2081",
+    "namn": "Borlänge",
+    "lan_kod": "20",
+    "lan_namn": "Dalarnas län"
+  },
+  {
+    "kod": "2082",
+    "namn": "Säter",
+    "lan_kod": "20",
+    "lan_namn": "Dalarnas län"
+  },
+  {
+    "kod": "2083",
+    "namn": "Hedemora",
+    "lan_kod": "20",
+    "lan_namn": "Dalarnas län"
+  },
+  {
+    "kod": "2084",
+    "namn": "Avesta",
+    "lan_kod": "20",
+    "lan_namn": "Dalarnas län"
+  },
+  {
+    "kod": "2085",
+    "namn": "Ludvika",
+    "lan_kod": "20",
+    "lan_namn": "Dalarnas län"
+  },
+  {
+    "kod": "2101",
+    "namn": "Ockelbo",
+    "lan_kod": "21",
+    "lan_namn": "Gävleborgs län"
+  },
+  {
+    "kod": "2104",
+    "namn": "Hofors",
+    "lan_kod": "21",
+    "lan_namn": "Gävleborgs län"
+  },
+  {
+    "kod": "2121",
+    "namn": "Ovanåker",
+    "lan_kod": "21",
+    "lan_namn": "Gävleborgs län"
+  },
+  {
+    "kod": "2132",
+    "namn": "Nordanstig",
+    "lan_kod": "21",
+    "lan_namn": "Gävleborgs län"
+  },
+  {
+    "kod": "2161",
+    "namn": "Ljusdal",
+    "lan_kod": "21",
+    "lan_namn": "Gävleborgs län"
+  },
+  {
+    "kod": "2180",
+    "namn": "Gävle",
+    "lan_kod": "21",
+    "lan_namn": "Gävleborgs län"
+  },
+  {
+    "kod": "2181",
+    "namn": "Sandviken",
+    "lan_kod": "21",
+    "lan_namn": "Gävleborgs län"
+  },
+  {
+    "kod": "2182",
+    "namn": "Söderhamn",
+    "lan_kod": "21",
+    "lan_namn": "Gävleborgs län"
+  },
+  {
+    "kod": "2183",
+    "namn": "Bollnäs",
+    "lan_kod": "21",
+    "lan_namn": "Gävleborgs län"
+  },
+  {
+    "kod": "2184",
+    "namn": "Hudiksvall",
+    "lan_kod": "21",
+    "lan_namn": "Gävleborgs län"
+  },
+  {
+    "kod": "2260",
+    "namn": "Ånge",
+    "lan_kod": "22",
+    "lan_namn": "Västernorrlands län"
+  },
+  {
+    "kod": "2262",
+    "namn": "Timrå",
+    "lan_kod": "22",
+    "lan_namn": "Västernorrlands län"
+  },
+  {
+    "kod": "2280",
+    "namn": "Härnösand",
+    "lan_kod": "22",
+    "lan_namn": "Västernorrlands län"
+  },
+  {
+    "kod": "2281",
+    "namn": "Sundsvall",
+    "lan_kod": "22",
+    "lan_namn": "Västernorrlands län"
+  },
+  {
+    "kod": "2282",
+    "namn": "Kramfors",
+    "lan_kod": "22",
+    "lan_namn": "Västernorrlands län"
+  },
+  {
+    "kod": "2283",
+    "namn": "Sollefteå",
+    "lan_kod": "22",
+    "lan_namn": "Västernorrlands län"
+  },
+  {
+    "kod": "2284",
+    "namn": "Örnsköldsvik",
+    "lan_kod": "22",
+    "lan_namn": "Västernorrlands län"
+  },
+  {
+    "kod": "2303",
+    "namn": "Ragunda",
+    "lan_kod": "23",
+    "lan_namn": "Jämtlands län"
+  },
+  {
+    "kod": "2305",
+    "namn": "Bräcke",
+    "lan_kod": "23",
+    "lan_namn": "Jämtlands län"
+  },
+  {
+    "kod": "2309",
+    "namn": "Krokom",
+    "lan_kod": "23",
+    "lan_namn": "Jämtlands län"
+  },
+  {
+    "kod": "2313",
+    "namn": "Strömsund",
+    "lan_kod": "23",
+    "lan_namn": "Jämtlands län"
+  },
+  {
+    "kod": "2321",
+    "namn": "Åre",
+    "lan_kod": "23",
+    "lan_namn": "Jämtlands län"
+  },
+  {
+    "kod": "2326",
+    "namn": "Berg",
+    "lan_kod": "23",
+    "lan_namn": "Jämtlands län"
+  },
+  {
+    "kod": "2361",
+    "namn": "Härjedalen",
+    "lan_kod": "23",
+    "lan_namn": "Jämtlands län"
+  },
+  {
+    "kod": "2380",
+    "namn": "Östersund",
+    "lan_kod": "23",
+    "lan_namn": "Jämtlands län"
+  },
+  {
+    "kod": "2401",
+    "namn": "Nordmaling",
+    "lan_kod": "24",
+    "lan_namn": "Västerbottens län"
+  },
+  {
+    "kod": "2403",
+    "namn": "Bjurholm",
+    "lan_kod": "24",
+    "lan_namn": "Västerbottens län"
+  },
+  {
+    "kod": "2404",
+    "namn": "Vindeln",
+    "lan_kod": "24",
+    "lan_namn": "Västerbottens län"
+  },
+  {
+    "kod": "2409",
+    "namn": "Robertsfors",
+    "lan_kod": "24",
+    "lan_namn": "Västerbottens län"
+  },
+  {
+    "kod": "2417",
+    "namn": "Norsjö",
+    "lan_kod": "24",
+    "lan_namn": "Västerbottens län"
+  },
+  {
+    "kod": "2418",
+    "namn": "Malå",
+    "lan_kod": "24",
+    "lan_namn": "Västerbottens län"
+  },
+  {
+    "kod": "2421",
+    "namn": "Storuman",
+    "lan_kod": "24",
+    "lan_namn": "Västerbottens län"
+  },
+  {
+    "kod": "2422",
+    "namn": "Sorsele",
+    "lan_kod": "24",
+    "lan_namn": "Västerbottens län"
+  },
+  {
+    "kod": "2425",
+    "namn": "Dorotea",
+    "lan_kod": "24",
+    "lan_namn": "Västerbottens län"
+  },
+  {
+    "kod": "2460",
+    "namn": "Vännäs",
+    "lan_kod": "24",
+    "lan_namn": "Västerbottens län"
+  },
+  {
+    "kod": "2462",
+    "namn": "Vilhelmina",
+    "lan_kod": "24",
+    "lan_namn": "Västerbottens län"
+  },
+  {
+    "kod": "2463",
+    "namn": "Åsele",
+    "lan_kod": "24",
+    "lan_namn": "Västerbottens län"
+  },
+  {
+    "kod": "2480",
+    "namn": "Umeå",
+    "lan_kod": "24",
+    "lan_namn": "Västerbottens län"
+  },
+  {
+    "kod": "2481",
+    "namn": "Lycksele",
+    "lan_kod": "24",
+    "lan_namn": "Västerbottens län"
+  },
+  {
+    "kod": "2482",
+    "namn": "Skellefteå",
+    "lan_kod": "24",
+    "lan_namn": "Västerbottens län"
+  },
+  {
+    "kod": "2505",
+    "namn": "Arvidsjaur",
+    "lan_kod": "25",
+    "lan_namn": "Norrbottens län"
+  },
+  {
+    "kod": "2506",
+    "namn": "Arjeplog",
+    "lan_kod": "25",
+    "lan_namn": "Norrbottens län"
+  },
+  {
+    "kod": "2510",
+    "namn": "Jokkmokk",
+    "lan_kod": "25",
+    "lan_namn": "Norrbottens län"
+  },
+  {
+    "kod": "2513",
+    "namn": "Överkalix",
+    "lan_kod": "25",
+    "lan_namn": "Norrbottens län"
+  },
+  {
+    "kod": "2514",
+    "namn": "Kalix",
+    "lan_kod": "25",
+    "lan_namn": "Norrbottens län"
+  },
+  {
+    "kod": "2518",
+    "namn": "Övertorneå",
+    "lan_kod": "25",
+    "lan_namn": "Norrbottens län"
+  },
+  {
+    "kod": "2521",
+    "namn": "Pajala",
+    "lan_kod": "25",
+    "lan_namn": "Norrbottens län"
+  },
+  {
+    "kod": "2523",
+    "namn": "Gällivare",
+    "lan_kod": "25",
+    "lan_namn": "Norrbottens län"
+  },
+  {
+    "kod": "2560",
+    "namn": "Älvsbyn",
+    "lan_kod": "25",
+    "lan_namn": "Norrbottens län"
+  },
+  {
+    "kod": "2580",
+    "namn": "Luleå",
+    "lan_kod": "25",
+    "lan_namn": "Norrbottens län"
+  },
+  {
+    "kod": "2581",
+    "namn": "Piteå",
+    "lan_kod": "25",
+    "lan_namn": "Norrbottens län"
+  },
+  {
+    "kod": "2582",
+    "namn": "Boden",
+    "lan_kod": "25",
+    "lan_namn": "Norrbottens län"
+  },
+  {
+    "kod": "2583",
+    "namn": "Haparanda",
+    "lan_kod": "25",
+    "lan_namn": "Norrbottens län"
+  },
+  {
+    "kod": "2584",
+    "namn": "Kiruna",
+    "lan_kod": "25",
+    "lan_namn": "Norrbottens län"
+  }
+]

@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Valresultat – välj kommun</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="select-wrap">
+  <div class="select-card">
+    <h1>Valresultat på karta</h1>
+    <p class="lead">Välj kommun, valår och valtyp. Resultatet visas jämfört med föregående val.</p>
+
+    <form id="valForm">
+      <div class="field">
+        <label for="kommunInput">Kommun</label>
+        <input type="text" id="kommunInput" autocomplete="off" placeholder="Sök kommun, t.ex. Lund" aria-expanded="false" aria-autocomplete="list">
+        <input type="hidden" id="kommunKod">
+        <div class="combobox-list" id="kommunList"></div>
+        <div class="hint" id="kommunHint"></div>
+      </div>
+
+      <div class="field">
+        <label>Valtyp</label>
+        <div class="segmented" id="valtypSegmented">
+          <button type="button" data-val="riksdag" class="active">Riksdag</button>
+          <button type="button" data-val="region">Region</button>
+          <button type="button" data-val="kommun">Kommun</button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label for="arSelect">Valår</label>
+        <select id="arSelect"></select>
+        <div class="hint">2018 och 2022 är slutgiltiga facit och passar bra för att testa kartan innan valet 2026.</div>
+      </div>
+
+      <button type="submit" class="btn-primary" id="submitBtn">Visa karta</button>
+      <div class="form-error" id="formError"></div>
+    </form>
+  </div>
+</div>
+
+<script src="js/select.js"></script>
+</body>
+</html>

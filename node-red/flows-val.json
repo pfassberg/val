@@ -1,0 +1,558 @@
+[
+  {
+    "id": "tab_val_web",
+    "type": "tab",
+    "label": "Val – webb & API",
+    "disabled": false,
+    "info": "Servera /val (Leaflet-appen) och REST-API:et /val/api/*.\n\nKräver att global konfiguration (tab \"Val – realtid\", noden \"Starta vid deploy\") har körts minst en gång sedan senaste omstart av Node-RED.\n\nSe README.md i repot för installationsinstruktioner."
+  },
+  {
+    "id": "tab_val_realtid",
+    "type": "tab",
+    "label": "Val – realtid (WebSocket)",
+    "disabled": false,
+    "info": "Global konfiguration + hjälpfunktioner (körs vid deploy), samt pollning mot val.se och utskick till klienter som prenumererar via WebSocket (/val/ws)."
+  },
+  {
+    "id": "cfg_ws_listener",
+    "type": "websocket-listener",
+    "path": "/val/ws",
+    "wholemsg": "false"
+  },
+  {
+    "id": "sf_hamta_valdata",
+    "type": "subflow",
+    "name": "HamtaValdata",
+    "info": "In:  msg.payload = { kommun: {kod,namn,lan_kod,lan_namn}, ar, valtyp }\nUt:  msg.payload = { meta, geojson: FeatureCollection, uppsamlingsdistrikt }\n\nHämtar valdistriktens geometri + resultat för valt år från val.se, hämtar samma sak för jämförelsevalet (ar - 4), normaliserar och slår ihop dem. Kastar ett Error om varken geometri eller aktuellt resultat kunde hämtas (fångas av en Catch-nod i den anropande fliken).",
+    "category": "",
+    "in": [
+      {
+        "x": 60,
+        "y": 60,
+        "wires": [
+          {
+            "id": "n_sf_fn"
+          }
+        ]
+      }
+    ],
+    "out": [
+      {
+        "x": 460,
+        "y": 60,
+        "wires": [
+          {
+            "id": "n_sf_fn",
+            "port": 0
+          }
+        ]
+      }
+    ],
+    "env": [],
+    "color": "#E2D96E"
+  },
+  {
+    "id": "n_sf_fn",
+    "type": "function",
+    "z": "sf_hamta_valdata",
+    "name": "Hämta, normalisera och jämför",
+    "func": "// ============================================================================\n// Subflow \"HamtaValdata\" - enda funktionsnoden.\n// In:  msg.payload = { kommun: {kod,namn,lan_kod,lan_namn}, ar, valtyp }\n// Ut:  msg.payload = { meta, geojson: FeatureCollection, uppsamlingsdistrikt }\n//\n// OBS: fältnamnen som letas upp med H.pickField() nedan är BÄSTA GISSNING\n// utifrån val.se:s dokumentation (svenska namn som \"distriktskod\", \"parti\",\n// \"röster\" osv). De är INTE verifierade mot en riktig fil (val.se är inte\n// nåbart från miljön där detta skrevs). När du kör detta första gången mot\n// riktig data kommer eventuella felmeddelanden att lista de FAKTISKA\n// fältnamnen i JSON-svaret från val.se - lägg då till dem först i\n// kandidatlistan för respektive fält nedan.\n// ============================================================================\nconst H = global.get(\"valHelpers\");\nconst cfg = global.get(\"valConfig\");\n\nconst { kommun, ar, valtyp } = msg.payload;\nconst lanKod = kommun.lan_kod;\nconst isLive = cfg.liveYears.indexOf(ar) !== -1;\nconst ttl = isLive ? cfg.cacheTtlLiveMs : cfg.cacheTtlFinalMs;\nconst jamforAr = ar - cfg.jamforOffsetAr;\nconst varningar = [];\n\n// ---------------------------------------------------------------------------\n// 1. Hämta geometrifil (valdistriktens utbredning) för länet.\n// ---------------------------------------------------------------------------\nlet geoFeatures = [];\ntry {\n    const geoUrl = H.fillUrlTemplate(cfg.urls.geo, { ar, lan_kod: lanKod });\n    const geoJson = await H.fetchJson(geoUrl, `geo_${ar}_${lanKod}`, ttl);\n    const allFeatures = geoJson.features || geoJson.Features || [];\n    geoFeatures = allFeatures.filter((f) => {\n        const kkod = H.pickField(f.properties, [\"kommun_kod\", \"kommunKod\", \"kommunkod\", \"KOMMUN\"], {\n            default: null\n        });\n        return kkod === kommun.kod || String(kkod).padStart(4, \"0\") === kommun.kod;\n    });\n} catch (e) {\n    varningar.push(\"Kunde inte hämta/tolka geometrifil: \" + e.message);\n}\n\n// ---------------------------------------------------------------------------\n// 2. Normaliserar en resultatfil (JSON från val.se) till en Map<distriktskod, post>\n// ---------------------------------------------------------------------------\nfunction extraheraDistriktLista(raw) {\n    if (Array.isArray(raw)) return raw;\n    const kand = [\"distrikt\", \"omraden\", \"resultat\", \"data\", \"records\", \"valdistrikt\"];\n    for (const k of kand) {\n        if (Array.isArray(raw[k])) return raw[k];\n    }\n    throw new Error(\n        \"Hittade ingen lista med distrikt i svaret. Toppnivåfält: [\" + Object.keys(raw).join(\", \") + \"]\"\n    );\n}\n\nfunction normaliseraRoster(rawParti) {\n    return rawParti.map((p) => ({\n        parti: String(\n            H.pickField(p, [\"partiKod\", \"parti\", \"beteckning\", \"kod\", \"party\"], { required: true, label: \"partikod\" })\n        ).toUpperCase(),\n        röster: Number(H.pickField(p, [\"röster\", \"rostetal\", \"antalRoster\", \"votes\", \"antal\"], { default: 0 })),\n        andel: Number(H.pickField(p, [\"andel\", \"procent\", \"share\", \"andelProcent\"], { default: 0 })),\n        mandat: H.pickField(p, [\"mandat\", \"antalMandat\", \"seats\"], { default: null })\n    }));\n}\n\nasync function hamtaOchNormaliseraResultat(forAr) {\n    const url = H.fillUrlTemplate(cfg.urls.resultat, { ar: forAr, lan_kod: lanKod, valtyp });\n    const raw = await H.fetchJson(url, `resultat_${forAr}_${valtyp}_${lanKod}`, ttl);\n    const lista = extraheraDistriktLista(raw);\n\n    const byKod = new Map();\n    for (const rec of lista) {\n        const kkod = String(\n            H.pickField(rec, [\"kommunkod\", \"kommun_kod\", \"kommunKod\"], { default: \"\" })\n        ).padStart(4, \"0\");\n        const kod = String(\n            H.pickField(rec, [\"distriktskod\", \"distrikt_kod\", \"omradeskod\", \"kod\", \"id\"], {\n                required: true,\n                label: \"distriktskod\"\n            })\n        );\n        // Om posten saknar egen kommunkod, härled den ur distriktskodens 4 första tecken\n        // (svensk konvention: distriktskod = 4 siffror kommun + löpnummer).\n        const effektivKkod = kkod && kkod !== \"0000\" ? kkod : kod.slice(0, 4);\n        if (effektivKkod !== kommun.kod) continue;\n\n        const namn = String(H.pickField(rec, [\"distriktnamn\", \"namn\", \"name\"], { default: kod }));\n        const typRaw = H.pickField(rec, [\"typ\", \"distriktstyp\"], { default: \"\" });\n        const arUppsamling =\n            /uppsamling/i.test(String(typRaw)) || /uppsamling/i.test(namn) ||\n            H.pickField(rec, [\"ar_uppsamlingsdistrikt\", \"uppsamlingsdistrikt\"], { default: false }) === true;\n\n        const rawRoster = H.pickField(rec, [\"partier\", \"resultat\", \"partiResultat\", \"roster\", \"votes\"], {\n            required: true,\n            label: \"partiresultat för distrikt \" + kod\n        });\n        const roster = normaliseraRoster(rawRoster);\n        const valdeltagande = H.pickField(rec, [\"valdeltagande\", \"rostdeltagande\", \"deltagande\", \"turnout\"], {\n            default: null\n        });\n\n        let ledandeParti = null;\n        let bastAndel = -1;\n        for (const p of roster) {\n            if (p.andel > bastAndel) {\n                bastAndel = p.andel;\n                ledandeParti = p.parti;\n            }\n        }\n\n        byKod.set(kod, {\n            kod,\n            namn,\n            typ: arUppsamling ? \"uppsamling\" : \"ordinarie\",\n            valdeltagande,\n            roster,\n            ledandeParti\n        });\n    }\n    return byKod;\n}\n\n// ---------------------------------------------------------------------------\n// 3. Hämta nuvarande och (om möjligt) föregående jämförelseval.\n// ---------------------------------------------------------------------------\nlet currentByKod = new Map();\ntry {\n    currentByKod = await hamtaOchNormaliseraResultat(ar);\n} catch (e) {\n    varningar.push(\"Kunde inte hämta/tolka resultatfil för \" + ar + \": \" + e.message);\n}\n\nlet prevByKod = new Map();\nlet harJamforelse = true;\ntry {\n    prevByKod = await hamtaOchNormaliseraResultat(jamforAr);\n} catch (e) {\n    harJamforelse = false;\n    varningar.push(\"Kunde inte hämta jämförelseval \" + jamforAr + \": \" + e.message);\n}\n\nif (currentByKod.size === 0 && geoFeatures.length === 0) {\n    // Inget att visa alls - eskalera till fel så anropande flöde kan svara 502.\n    const err = new Error(varningar.join(\" | \") || \"Ingen data hittades.\");\n    throw err;\n}\n\n// ---------------------------------------------------------------------------\n// 4. Bygg jämförelse per distrikt (nuvarande vs föregående val).\n// ---------------------------------------------------------------------------\nfunction byggJamforandeDistrikt(kod, curr) {\n    const prev = prevByKod.get(kod);\n    const jamforbar = harJamforelse && !!prev;\n\n    const roster = curr.roster.map((p) => {\n        const prevParti = prev ? prev.roster.find((pp) => pp.parti === p.parti) : null;\n        return {\n            parti: p.parti,\n            röster: p.röster,\n            andel: p.andel,\n            mandat: p.mandat,\n            andel_forra: prevParti ? prevParti.andel : null,\n            forandring: prevParti ? Number((p.andel - prevParti.andel).toFixed(2)) : null\n        };\n    });\n\n    return {\n        kod: curr.kod,\n        namn: curr.namn,\n        typ: curr.typ,\n        valdeltagande: curr.valdeltagande,\n        valdeltagande_forra: prev ? prev.valdeltagande : null,\n        roster,\n        ledandeParti: curr.ledandeParti,\n        ledandeParti_forra: prev ? prev.ledandeParti : null,\n        partibyte: jamforbar ? prev.ledandeParti !== curr.ledandeParti : false,\n        jamforbar\n    };\n}\n\nconst geoByKod = new Map();\nfor (const f of geoFeatures) {\n    const kod = String(\n        H.pickField(f.properties, [\"distriktskod\", \"distrikt_kod\", \"omradeskod\", \"kod\", \"id\"], {\n            required: true,\n            label: \"distriktskod (geometri)\"\n        })\n    );\n    geoByKod.set(kod, f);\n}\n\nconst features = [];\nconst uppsamlingsdistrikt = [];\n\nfor (const [kod, curr] of currentByKod.entries()) {\n    const properties = byggJamforandeDistrikt(kod, curr);\n    const geoFeature = geoByKod.get(kod);\n    if (geoFeature && curr.typ !== \"uppsamling\") {\n        features.push({\n            type: \"Feature\",\n            geometry: geoFeature.geometry,\n            properties\n        });\n    } else {\n        uppsamlingsdistrikt.push(properties);\n    }\n}\n\n// ---------------------------------------------------------------------------\n// 5. Klart - bygg svaret.\n// ---------------------------------------------------------------------------\nmsg.payload = {\n    meta: {\n        kommun,\n        ar,\n        valtyp,\n        jamforAr: harJamforelse ? jamforAr : null,\n        ar_live: isLive,\n        senast_uppdaterad: new Date().toISOString(),\n        kalla: \"val.se\",\n        varningar\n    },\n    geojson: {\n        type: \"FeatureCollection\",\n        features\n    },\n    uppsamlingsdistrikt\n};\n\nreturn msg;\n",
+    "outputs": 1,
+    "timeout": 0,
+    "noerr": 0,
+    "initialize": "",
+    "finalize": "",
+    "libs": [],
+    "x": 260,
+    "y": 60,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "n_http_kommuner",
+    "type": "http in",
+    "z": "tab_val_web",
+    "name": "GET /val/api/kommuner",
+    "url": "/val/api/kommuner",
+    "method": "get",
+    "upload": false,
+    "swaggerDoc": "",
+    "x": 150,
+    "y": 60,
+    "wires": [
+      [
+        "n_fn_kommuner"
+      ]
+    ]
+  },
+  {
+    "id": "n_fn_kommuner",
+    "type": "function",
+    "z": "tab_val_web",
+    "name": "Läs kommuner.json",
+    "func": "// GET /val/api/kommuner -> lista över Sveriges 290 kommuner (kod, namn, län).\nconst H = global.get(\"valHelpers\");\ntry {\n    msg.payload = H.cachedReadJson(\"kommuner.json\");\n    msg.statusCode = 200;\n} catch (e) {\n    msg.statusCode = 500;\n    msg.payload = { error: \"Kunde inte läsa kommuner.json\", detalj: e.message };\n}\nmsg.headers = { \"Content-Type\": \"application/json; charset=utf-8\" };\nreturn msg;\n",
+    "outputs": 1,
+    "x": 400,
+    "y": 60,
+    "wires": [
+      [
+        "n_http_response"
+      ]
+    ]
+  },
+  {
+    "id": "n_http_valtyper",
+    "type": "http in",
+    "z": "tab_val_web",
+    "name": "GET /val/api/valtyper",
+    "url": "/val/api/valtyper",
+    "method": "get",
+    "upload": false,
+    "swaggerDoc": "",
+    "x": 150,
+    "y": 120,
+    "wires": [
+      [
+        "n_fn_valtyper"
+      ]
+    ]
+  },
+  {
+    "id": "n_fn_valtyper",
+    "type": "function",
+    "z": "tab_val_web",
+    "name": "Läs valtyper.json",
+    "func": "// GET /val/api/valtyper -> riksdag / region / kommun\nconst H = global.get(\"valHelpers\");\ntry {\n    msg.payload = H.cachedReadJson(\"valtyper.json\");\n    msg.statusCode = 200;\n} catch (e) {\n    msg.statusCode = 500;\n    msg.payload = { error: \"Kunde inte läsa valtyper.json\", detalj: e.message };\n}\nmsg.headers = { \"Content-Type\": \"application/json; charset=utf-8\" };\nreturn msg;\n",
+    "outputs": 1,
+    "x": 400,
+    "y": 120,
+    "wires": [
+      [
+        "n_http_response"
+      ]
+    ]
+  },
+  {
+    "id": "n_http_partier",
+    "type": "http in",
+    "z": "tab_val_web",
+    "name": "GET /val/api/partier",
+    "url": "/val/api/partier",
+    "method": "get",
+    "upload": false,
+    "swaggerDoc": "",
+    "x": 150,
+    "y": 180,
+    "wires": [
+      [
+        "n_fn_partier"
+      ]
+    ]
+  },
+  {
+    "id": "n_fn_partier",
+    "type": "function",
+    "z": "tab_val_web",
+    "name": "Läs party-styles.json",
+    "func": "// GET /val/api/partier -> färgsättning per parti (redigera gärna hex-koderna)\nconst H = global.get(\"valHelpers\");\ntry {\n    msg.payload = H.cachedReadJson(\"party-styles.json\");\n    msg.statusCode = 200;\n} catch (e) {\n    msg.statusCode = 500;\n    msg.payload = { error: \"Kunde inte läsa party-styles.json\", detalj: e.message };\n}\nmsg.headers = { \"Content-Type\": \"application/json; charset=utf-8\" };\nreturn msg;\n",
+    "outputs": 1,
+    "x": 400,
+    "y": 180,
+    "wires": [
+      [
+        "n_http_response"
+      ]
+    ]
+  },
+  {
+    "id": "n_http_ar",
+    "type": "http in",
+    "z": "tab_val_web",
+    "name": "GET /val/api/ar",
+    "url": "/val/api/ar",
+    "method": "get",
+    "upload": false,
+    "swaggerDoc": "",
+    "x": 130,
+    "y": 240,
+    "wires": [
+      [
+        "n_fn_ar"
+      ]
+    ]
+  },
+  {
+    "id": "n_fn_ar",
+    "type": "function",
+    "z": "tab_val_web",
+    "name": "Bygg årslista",
+    "func": "// GET /val/api/ar -> valbara år, med status \"live\" (pollas i realtid) eller\n// \"final\" (slutgiltigt facit, hämtas en gång och cachas).\nconst cfg = global.get(\"valConfig\");\n\nconst live = cfg.liveYears.map((ar) => ({ ar, status: \"live\", namn: ar + \" (pågående)\" }));\nconst final = cfg.finalYears.map((ar) => ({ ar, status: \"final\", namn: String(ar) }));\n\nconst alla = live.concat(final).sort((a, b) => b.ar - a.ar);\n\nmsg.payload = alla;\nmsg.statusCode = 200;\nmsg.headers = { \"Content-Type\": \"application/json; charset=utf-8\" };\nreturn msg;\n",
+    "outputs": 1,
+    "x": 390,
+    "y": 240,
+    "wires": [
+      [
+        "n_http_response"
+      ]
+    ]
+  },
+  {
+    "id": "n_http_valdistrikt",
+    "type": "http in",
+    "z": "tab_val_web",
+    "name": "GET /val/api/valdistrikt",
+    "url": "/val/api/valdistrikt",
+    "method": "get",
+    "upload": false,
+    "swaggerDoc": "",
+    "x": 160,
+    "y": 320,
+    "wires": [
+      [
+        "n_fn_validate"
+      ]
+    ]
+  },
+  {
+    "id": "n_fn_validate",
+    "type": "function",
+    "z": "tab_val_web",
+    "name": "Validera query (kommun/ar/valtyp)",
+    "func": "// GET /val/api/valdistrikt?kommun=1281&ar=2022&valtyp=riksdag\n// Två utgångar: 0 = ogiltig fråga (går direkt till http response),\n//               1 = giltig fråga (går vidare till subflowet HamtaValdata).\nconst H = global.get(\"valHelpers\");\nconst q = msg.req.query || {};\n\nconst kommunKod = String(q.kommun || \"\").trim();\nconst ar = parseInt(q.ar, 10);\nconst valtyp = String(q.valtyp || \"\").trim();\nconst giltigaValtyper = [\"riksdag\", \"region\", \"kommun\"];\n\nlet kommuner;\ntry {\n    kommuner = H.cachedReadJson(\"kommuner.json\");\n} catch (e) {\n    msg.statusCode = 500;\n    msg.headers = { \"Content-Type\": \"application/json; charset=utf-8\" };\n    msg.payload = { error: \"Kunde inte läsa kommunlistan\", detalj: e.message };\n    return [msg, null];\n}\n\nconst kommunInfo = kommuner.find((k) => k.kod === kommunKod);\nconst fel = [];\nif (!kommunInfo) fel.push(\"okänd kommunkod: '\" + kommunKod + \"'\");\nif (!Number.isInteger(ar) || ar < 2002 || ar > 2100) fel.push(\"ogiltigt år: '\" + q.ar + \"'\");\nif (giltigaValtyper.indexOf(valtyp) === -1) {\n    fel.push(\"ogiltig valtyp (måste vara riksdag/region/kommun): '\" + valtyp + \"'\");\n}\n\nif (fel.length) {\n    msg.statusCode = 400;\n    msg.headers = { \"Content-Type\": \"application/json; charset=utf-8\" };\n    msg.payload = { error: \"Ogiltig förfrågan\", detaljer: fel };\n    return [msg, null];\n}\n\nmsg.payload = { kommun: kommunInfo, ar, valtyp };\nreturn [null, msg];\n",
+    "outputs": 2,
+    "x": 440,
+    "y": 320,
+    "wires": [
+      [
+        "n_http_response"
+      ],
+      [
+        "n_call_hamta_1"
+      ]
+    ]
+  },
+  {
+    "id": "n_call_hamta_1",
+    "type": "subflow:sf_hamta_valdata",
+    "z": "tab_val_web",
+    "name": "Hämta valdata",
+    "env": [],
+    "x": 700,
+    "y": 320,
+    "wires": [
+      [
+        "n_fn_ok"
+      ]
+    ]
+  },
+  {
+    "id": "n_fn_ok",
+    "type": "function",
+    "z": "tab_val_web",
+    "name": "200 OK",
+    "func": "// Efter lyckat anrop till subflowet HamtaValdata: paketera som HTTP 200-svar.\nmsg.statusCode = 200;\nmsg.headers = { \"Content-Type\": \"application/json; charset=utf-8\" };\nreturn msg;\n",
+    "outputs": 1,
+    "x": 900,
+    "y": 320,
+    "wires": [
+      [
+        "n_http_response"
+      ]
+    ]
+  },
+  {
+    "id": "n_catch_1",
+    "type": "catch",
+    "z": "tab_val_web",
+    "name": "Fångar fel från HamtaValdata",
+    "scope": [
+      "n_call_hamta_1"
+    ],
+    "uncaught": false,
+    "x": 700,
+    "y": 380,
+    "wires": [
+      [
+        "n_fn_wraperr"
+      ]
+    ]
+  },
+  {
+    "id": "n_fn_wraperr",
+    "type": "function",
+    "z": "tab_val_web",
+    "name": "502 Fel",
+    "func": "// Fångar fel som kastas i subflowet HamtaValdata (t.ex. att val.se inte\n// svarar, eller att ett fältnamn i normaliseringen inte hittas) och gör om\n// dem till ett tydligt JSON-felsvar istället för att flödet kraschar tyst.\nconst err = msg.error || {};\nnode.warn(\"Fel vid hämtning av valdata: \" + (err.message || JSON.stringify(err)));\n\nmsg.statusCode = 502;\nmsg.headers = { \"Content-Type\": \"application/json; charset=utf-8\" };\nmsg.payload = {\n    error: \"Kunde inte hämta/tolka valresultat\",\n    detalj: err.message || String(err)\n};\nreturn msg;\n",
+    "outputs": 1,
+    "x": 900,
+    "y": 380,
+    "wires": [
+      [
+        "n_http_response"
+      ]
+    ]
+  },
+  {
+    "id": "n_comment_static",
+    "type": "comment",
+    "z": "tab_val_web",
+    "name": "Statiska filer måste registreras EFTER /val/api/* ovan, så att wildcarden inte kapar API-anropen.",
+    "x": 350,
+    "y": 460,
+    "wires": []
+  },
+  {
+    "id": "n_http_static_root",
+    "type": "http in",
+    "z": "tab_val_web",
+    "name": "GET /val",
+    "url": "/val",
+    "method": "get",
+    "upload": false,
+    "swaggerDoc": "",
+    "x": 130,
+    "y": 520,
+    "wires": [
+      [
+        "n_fn_static"
+      ]
+    ]
+  },
+  {
+    "id": "n_http_static_rootslash",
+    "type": "http in",
+    "z": "tab_val_web",
+    "name": "GET /val/",
+    "url": "/val/",
+    "method": "get",
+    "upload": false,
+    "swaggerDoc": "",
+    "x": 130,
+    "y": 560,
+    "wires": [
+      [
+        "n_fn_static"
+      ]
+    ]
+  },
+  {
+    "id": "n_http_static_wild",
+    "type": "http in",
+    "z": "tab_val_web",
+    "name": "GET /val/*",
+    "url": "/val/*",
+    "method": "get",
+    "upload": false,
+    "swaggerDoc": "",
+    "x": 130,
+    "y": 600,
+    "wires": [
+      [
+        "n_fn_static"
+      ]
+    ]
+  },
+  {
+    "id": "n_fn_static",
+    "type": "function",
+    "z": "tab_val_web",
+    "name": "Servera statisk fil",
+    "func": "// Statisk filserver för /val/* (Leaflet-kartan, JS, CSS).\n// Kopplad från: http in \"GET /val\" och \"GET /val/*\"  ->  denna nod -> http response\nconst fs = global.get(\"fs\") || require(\"fs\");\nconst path = global.get(\"path\") || require(\"path\");\nconst cfg = global.get(\"valConfig\");\n\nconst MIME = {\n    \".html\": \"text/html; charset=utf-8\",\n    \".js\": \"application/javascript; charset=utf-8\",\n    \".css\": \"text/css; charset=utf-8\",\n    \".json\": \"application/json; charset=utf-8\",\n    \".svg\": \"image/svg+xml\",\n    \".png\": \"image/png\",\n    \".ico\": \"image/x-icon\",\n    \".webmanifest\": \"application/manifest+json\"\n};\n\nlet reqPath = \"\";\nif (msg.req.params && msg.req.params[0] !== undefined) {\n    reqPath = msg.req.params[0];\n} else if (msg.req.path) {\n    reqPath = msg.req.path.replace(/^\\/val\\/?/, \"\");\n}\nif (reqPath === \"\" || reqPath.endsWith(\"/\")) {\n    reqPath += \"index.html\";\n}\n\n// Skydda mot path traversal (\"../../etc/passwd\" etc).\nconst resolved = path.resolve(cfg.webRoot, reqPath);\nif (!resolved.startsWith(path.resolve(cfg.webRoot))) {\n    msg.statusCode = 403;\n    msg.payload = \"Förbjuden sökväg\";\n    return msg;\n}\n\ntry {\n    const data = fs.readFileSync(resolved);\n    const ext = path.extname(resolved).toLowerCase();\n    msg.headers = { \"Content-Type\": MIME[ext] || \"application/octet-stream\" };\n    msg.statusCode = 200;\n    msg.payload = data;\n} catch (e) {\n    msg.statusCode = 404;\n    msg.headers = { \"Content-Type\": \"text/plain; charset=utf-8\" };\n    msg.payload = \"Hittar inte filen: \" + reqPath;\n}\nreturn msg;\n",
+    "outputs": 1,
+    "x": 400,
+    "y": 560,
+    "wires": [
+      [
+        "n_http_response"
+      ]
+    ]
+  },
+  {
+    "id": "n_http_response",
+    "type": "http response",
+    "z": "tab_val_web",
+    "name": "HTTP svar",
+    "statusCode": "",
+    "headers": {},
+    "x": 1150,
+    "y": 300,
+    "wires": []
+  },
+  {
+    "id": "n_init_inject",
+    "type": "inject",
+    "z": "tab_val_realtid",
+    "name": "Starta vid deploy",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "",
+    "crontab": "",
+    "once": true,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 150,
+    "y": 60,
+    "wires": [
+      [
+        "n_init_fn"
+      ]
+    ]
+  },
+  {
+    "id": "n_init_fn",
+    "type": "function",
+    "z": "tab_val_realtid",
+    "name": "Global konfiguration + hjälpfunktioner",
+    "func": "// ============================================================================\n// INIT: körs en gång vid Deploy (triggas av injektionsnoden \"Starta vid deploy\")\n// Sätter global konfiguration + delade hjälpfunktioner som resten av flödet\n// (API-noderna, HamtaValdata-subflowet, polling-flödet) läser via global context.\n// ============================================================================\n\n// ---------------------------------------------------------------------------\n// !!! ÄNDRA DESSA SÖKVÄGAR så de stämmer med var du lade filerna på servern !!!\n// DATA_DIR  = mappen \"node-red/data\" från repot (kommuner.json, valtyper.json,\n//             party-styles.json) + en skrivbar \"cache\"-undermapp (skapas\n//             automatiskt).\n// WEB_ROOT  = mappen \"web/val\" från repot (index.html, karta.html, css, js).\n// ---------------------------------------------------------------------------\nconst DATA_DIR = \"/opt/nodered/val/data\";\nconst WEB_ROOT = \"/opt/nodered/val/web/val\";\n\nconst fs = global.get(\"fs\") || require(\"fs\");\nconst path = global.get(\"path\") || require(\"path\");\n\n// Skrivbar cache-katalog för nedladdad val.se-data (skapas om den saknas).\nconst CACHE_DIR = path.join(DATA_DIR, \"cache\");\ntry {\n    fs.mkdirSync(CACHE_DIR, { recursive: true });\n} catch (e) {\n    node.warn(\"Kunde inte skapa cache-katalogen \" + CACHE_DIR + \": \" + e.message);\n}\n\n// ---------------------------------------------------------------------------\n// URL-mallar för val.se:s rådata. {ar} / {lan_kod} / {kommun_kod} / {valtyp}\n// byts ut av valHelpers.fillUrlTemplate().\n//\n// !!! DESSA ÄR PLACEHOLDERS OCH MÅSTE VERIFIERAS MOT DEN RIKTIGA WEBBPLATSEN !!!\n// val.se är blockerad från utvecklingsmiljön den här koden skrevs i, så\n// exakta filnamn/sökvägar har inte kunnat verifieras automatiskt.\n//\n// Så här hittar du de riktiga URL:erna (tar ~5 minuter):\n//   1. Gå till https://www.val.se/valresultat-och-statistik/statistik-och-data\n//      och öppna sidan för \"Rådata\" (2002-2022 för historik, \"Rådata val 2026\"\n//      för valnatten). Ladda ner/öppna en fil för ett valår + valtyp + län och\n//      notera den riktiga URL:en och filens fältnamn.\n//   2. Alternativt: öppna https://resultat.val.se (valresultatsajten) i\n//      webbläsaren, öppna Nätverksfliken (F12 -> Network) och titta på vilka\n//      JSON-anrop sidan gör när du väljer ett valdistrikt/kommun. Det är\n//      exakt samma data vi vill hämta här.\n//   3. Uppdatera `urls.geo` och `urls.resultat` nedan, samt fältnamnen i\n//      valHelpers.pickField-anropen i funktionsnoden \"Hämta, normalisera och\n//      jämför\" (i subflowet HamtaValdata) om de skiljer sig.\n// ---------------------------------------------------------------------------\nconst urls = {\n    // Geometrifiler (valdistriktens utbredning), en fil per län, SWEREF99 TM.\n    geo: \"https://www.val.se/PLACEHOLDER-VERIFIERA/geodata/{ar}/{lan_kod}.json\",\n    // Resultatfiler (röster/mandat/valdeltagande per distrikt), en fil per\n    // län och valtyp.\n    resultat: \"https://www.val.se/PLACEHOLDER-VERIFIERA/radata/{ar}/{valtyp}/{lan_kod}.json\"\n};\n\n// Vilka valår som är \"levande\" (pollas kontinuerligt via WS under valkvällen)\n// resp. \"slutgiltiga\" (hämtas en gång och cachas permanent).\nconst liveYears = [2026];\nconst finalYears = [2022, 2018, 2014, 2010];\n\nglobal.set(\"valConfig\", {\n    dataDir: DATA_DIR,\n    webRoot: WEB_ROOT,\n    cacheDir: CACHE_DIR,\n    urls: urls,\n    liveYears: liveYears,\n    finalYears: finalYears,\n    // Hur många år bakåt jämförelsen ska gå (val hålls vart 4:e år i Sverige).\n    jamforOffsetAr: 4,\n    // Hur ofta (ms) pollningsflödet kollar om det finns nya siffror för\n    // levande prenumerationer.\n    pollIntervalMs: 30000,\n    // Hur länge (ms) en hämtad länsfil (geo/resultat) får cachas innan den\n    // hämtas på nytt. Slutgiltiga år (2018, 2022, ...) cachas i praktiken\n    // för alltid (30 dagar), levande år (2026) cachas bara en kort stund.\n    cacheTtlLiveMs: 20000,\n    cacheTtlFinalMs: 1000 * 60 * 60 * 24 * 30\n});\n\n// ---------------------------------------------------------------------------\n// Delade hjälpfunktioner, tillgängliga i alla andra function-noder via:\n//   const H = global.get(\"valHelpers\");\n// ---------------------------------------------------------------------------\nconst memoryJsonCache = new Map();\n\nfunction cachedReadJson(fileName) {\n    if (memoryJsonCache.has(fileName)) return memoryJsonCache.get(fileName);\n    const full = path.join(DATA_DIR, fileName);\n    const data = JSON.parse(fs.readFileSync(full, \"utf8\"));\n    memoryJsonCache.set(fileName, data);\n    return data;\n}\n\nfunction fillUrlTemplate(tpl, vars) {\n    return tpl.replace(/\\{(\\w+)\\}/g, (m, key) => {\n        if (!(key in vars) || vars[key] === undefined || vars[key] === null) {\n            throw new Error(\"Saknar värde för platshållare {\" + key + \"} i URL-mall: \" + tpl);\n        }\n        return encodeURIComponent(vars[key]);\n    });\n}\n\nfunction kommunLanKod(kommunKod) {\n    return String(kommunKod).padStart(4, \"0\").slice(0, 2);\n}\n\n// Hämtar JSON över HTTP(S) med enkel filcache på disk. `cacheKey` blir\n// filnamnet i cache-katalogen. `ttlMs` = hur länge cachen får användas.\nasync function fetchJson(url, cacheKey, ttlMs) {\n    const cacheFile = path.join(CACHE_DIR, cacheKey.replace(/[^a-zA-Z0-9_.-]/g, \"_\") + \".json\");\n    try {\n        const stat = fs.statSync(cacheFile);\n        if (Date.now() - stat.mtimeMs < ttlMs) {\n            return JSON.parse(fs.readFileSync(cacheFile, \"utf8\"));\n        }\n    } catch (e) {\n        // ingen cache ännu, fortsätt till hämtning\n    }\n\n    if (typeof fetch !== \"function\") {\n        throw new Error(\n            \"global fetch() saknas i denna Node-RED/Node.js-version. \" +\n            \"Kör Node.js 18+ , eller byt ut fetchJson() mot http request-noder.\"\n        );\n    }\n\n    const controller = new AbortController();\n    const timeout = setTimeout(() => controller.abort(), 20000);\n    let res;\n    try {\n        res = await fetch(url, { signal: controller.signal, headers: { \"User-Agent\": \"val-karta-nodered/1.0\" } });\n    } catch (e) {\n        throw new Error(\"Kunde inte nå \" + url + \": \" + e.message);\n    } finally {\n        clearTimeout(timeout);\n    }\n    if (!res.ok) {\n        throw new Error(\"HTTP \" + res.status + \" från \" + url);\n    }\n    const json = await res.json();\n    try {\n        fs.writeFileSync(cacheFile, JSON.stringify(json));\n    } catch (e) {\n        node.warn(\"Kunde inte skriva cache \" + cacheFile + \": \" + e.message);\n    }\n    return json;\n}\n\n// Letar efter första matchande fältet i `obj` bland `candidates` (skiftlägesokänsligt).\n// Kastar ett tydligt fel som listar de FAKTISKA nycklarna i objektet om inget\n// hittas och `required` är sant — det gör det snabbt att lägga till rätt\n// fältnamn när ni har verifierat den riktiga val.se-strukturen.\nfunction pickField(obj, candidates, opts) {\n    opts = opts || {};\n    const keys = Object.keys(obj || {});\n    const lowerMap = {};\n    keys.forEach((k) => (lowerMap[k.toLowerCase()] = k));\n    for (const c of candidates) {\n        if (obj && Object.prototype.hasOwnProperty.call(obj, c)) return obj[c];\n        const hit = lowerMap[c.toLowerCase()];\n        if (hit !== undefined) return obj[hit];\n    }\n    if (opts.required) {\n        throw new Error(\n            \"Hittade inget av fälten [\" + candidates.join(\", \") + \"] (\" + (opts.label || \"okänt fält\") +\n            \"). Faktiska fält i objektet: [\" + keys.join(\", \") + \"]. \" +\n            \"Lägg till rätt fältnamn i pickField-anropet i funktionsnoden.\"\n        );\n    }\n    return opts.default;\n}\n\nglobal.set(\"valHelpers\", {\n    cachedReadJson,\n    fillUrlTemplate,\n    kommunLanKod,\n    fetchJson,\n    pickField\n});\n\nnode.warn(\"val-karta: konfiguration och hjälpfunktioner initierade.\");\nreturn null;\n",
+    "outputs": 1,
+    "x": 470,
+    "y": 60,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "n_ws_in",
+    "type": "websocket in",
+    "z": "tab_val_realtid",
+    "name": "WS in (/val/ws)",
+    "server": "cfg_ws_listener",
+    "client": "",
+    "x": 150,
+    "y": 160,
+    "wires": [
+      [
+        "n_fn_wsmsg"
+      ]
+    ]
+  },
+  {
+    "id": "n_fn_wsmsg",
+    "type": "function",
+    "z": "tab_val_realtid",
+    "name": "Hantera subscribe/unsubscribe",
+    "func": "// websocket in (/val/ws) -> denna nod. Hanterar prenumerationer.\n// Klienten (web/val/js/karta.js) skickar:\n//   {\"type\":\"subscribe\",\"kommun\":\"1281\",\"ar\":2022,\"valtyp\":\"riksdag\"}\n// och skickar om samma meddelande var ~20:e sekund som \"heartbeat\" så att\n// vi vet att fliken fortfarande är öppen (annars städas prenumerationen bort\n// automatiskt av buildPollList efter 90 sekunders tystnad).\nlet data;\ntry {\n    data = JSON.parse(msg.payload);\n} catch (e) {\n    node.warn(\"Ogiltigt WS-meddelande (inte JSON): \" + msg.payload);\n    return null;\n}\n\nconst sessionId = msg._session && msg._session.id;\nif (!sessionId) return null;\n\nconst subs = flow.get(\"wsSubs\") || {};\n\nif (data.type === \"subscribe\") {\n    subs[sessionId] = {\n        kommun: String(data.kommun),\n        ar: parseInt(data.ar, 10),\n        valtyp: String(data.valtyp),\n        lastSeen: Date.now()\n    };\n    flow.set(\"wsSubs\", subs);\n} else if (data.type === \"unsubscribe\") {\n    delete subs[sessionId];\n    flow.set(\"wsSubs\", subs);\n}\n\nnode.status({ fill: \"green\", shape: \"dot\", text: Object.keys(subs).length + \" prenumeranter\" });\nreturn null;\n",
+    "outputs": 1,
+    "x": 420,
+    "y": 160,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "n_inject_poll",
+    "type": "inject",
+    "z": "tab_val_realtid",
+    "name": "Pollningstakt (30s)",
+    "props": [
+      {
+        "p": "payload"
+      }
+    ],
+    "repeat": "30",
+    "crontab": "",
+    "once": false,
+    "onceDelay": 0.1,
+    "topic": "",
+    "payload": "",
+    "payloadType": "date",
+    "x": 140,
+    "y": 260,
+    "wires": [
+      [
+        "n_fn_pollist"
+      ]
+    ]
+  },
+  {
+    "id": "n_fn_pollist",
+    "type": "function",
+    "z": "tab_val_realtid",
+    "name": "Bygg pollningslista",
+    "func": "// Injiceras var `valConfig.pollIntervalMs` ms. Städar bort inaktiva\n// WS-prenumerationer och bygger en lista med unika {kommun,ar,valtyp} som\n// ska pollas mot val.se just nu (bara \"levande\" valår, se valConfig.liveYears).\n// Ett utgående meddelande per kombination skickas vidare till subflowet\n// HamtaValdata (kopplat direkt på denna nods enda utgång).\nconst cfg = global.get(\"valConfig\");\nconst H = global.get(\"valHelpers\");\nconst STALE_MS = 90000;\nconst now = Date.now();\n\nconst subs = flow.get(\"wsSubs\") || {};\nlet ändrat = false;\nfor (const sid of Object.keys(subs)) {\n    if (!subs[sid].lastSeen || now - subs[sid].lastSeen > STALE_MS) {\n        delete subs[sid];\n        ändrat = true;\n    }\n}\nif (ändrat) flow.set(\"wsSubs\", subs);\n\nconst unika = new Map();\nfor (const s of Object.values(subs)) {\n    if (cfg.liveYears.indexOf(s.ar) === -1) continue; // slutgiltiga år pollas inte, bara skickas en gång via REST\n    const key = s.kommun + \"|\" + s.ar + \"|\" + s.valtyp;\n    if (!unika.has(key)) unika.set(key, { kommun: s.kommun, ar: s.ar, valtyp: s.valtyp });\n}\n\nnode.status({ fill: \"blue\", shape: \"dot\", text: unika.size + \" kombinationer pollas\" });\n\nif (unika.size === 0) return null;\n\nlet kommuner;\ntry {\n    kommuner = H.cachedReadJson(\"kommuner.json\");\n} catch (e) {\n    node.warn(\"buildPollList: kunde inte läsa kommuner.json: \" + e.message);\n    return null;\n}\n\nconst meddelanden = [];\nfor (const combo of unika.values()) {\n    const kommunInfo = kommuner.find((k) => k.kod === combo.kommun);\n    if (!kommunInfo) continue;\n    meddelanden.push({ payload: { kommun: kommunInfo, ar: combo.ar, valtyp: combo.valtyp } });\n}\n\nif (meddelanden.length === 0) return null;\nreturn [meddelanden];\n",
+    "outputs": 1,
+    "x": 400,
+    "y": 260,
+    "wires": [
+      [
+        "n_call_hamta_2"
+      ]
+    ]
+  },
+  {
+    "id": "n_call_hamta_2",
+    "type": "subflow:sf_hamta_valdata",
+    "z": "tab_val_realtid",
+    "name": "Hämta valdata",
+    "env": [],
+    "x": 630,
+    "y": 260,
+    "wires": [
+      [
+        "n_fn_diff"
+      ]
+    ]
+  },
+  {
+    "id": "n_fn_diff",
+    "type": "function",
+    "z": "tab_val_realtid",
+    "name": "Diffa & rikta till prenumeranter",
+    "func": "// Tar emot ett färskt resultat från subflowet HamtaValdata (en gång per\n// {kommun,ar,valtyp}-kombination som pollas), jämför mot senast utskickade\n// version och skickar bara ut det som faktiskt ändrats till de klienter som\n// prenumererar på just den kombinationen. Kopplad till: websocket out (/val/ws).\nconst { meta, geojson, uppsamlingsdistrikt } = msg.payload;\nconst key = meta.kommun.kod + \"|\" + meta.ar + \"|\" + meta.valtyp;\nconst snapshotKey = \"lastBroadcast_\" + key;\n\nconst previous = global.get(snapshotKey) || {};\nconst nyaSnapshot = {};\n\nfunction harAndrats(kod, properties) {\n    const serialized = JSON.stringify(properties);\n    nyaSnapshot[kod] = serialized;\n    return previous[kod] !== serialized;\n}\n\nconst distriktAndrade = [];\nfor (const f of geojson.features) {\n    if (harAndrats(f.properties.kod, f.properties)) distriktAndrade.push(f.properties);\n}\nconst uppsamlingAndrade = [];\nfor (const u of uppsamlingsdistrikt) {\n    if (harAndrats(u.kod, u)) uppsamlingAndrade.push(u);\n}\n\nglobal.set(snapshotKey, nyaSnapshot);\n\nconst subs = flow.get(\"wsSubs\") || {};\nconst targetSessions = Object.keys(subs).filter((sid) => {\n    const s = subs[sid];\n    return s.kommun === meta.kommun.kod && s.ar === meta.ar && s.valtyp === meta.valtyp;\n});\n\nif (targetSessions.length === 0) return null;\n\nconst harAndringar = distriktAndrade.length > 0 || uppsamlingAndrade.length > 0;\nconst payload = JSON.stringify({\n    type: harAndringar ? \"update\" : \"status\",\n    kommun: meta.kommun.kod,\n    ar: meta.ar,\n    valtyp: meta.valtyp,\n    ar_live: meta.ar_live,\n    senast_uppdaterad: meta.senast_uppdaterad,\n    varningar: meta.varningar,\n    distrikt: distriktAndrade,\n    uppsamlingsdistrikt: uppsamlingAndrade\n});\n\nconst utgaende = targetSessions.map((sid) => ({\n    payload,\n    _session: { type: \"websocket\", id: sid }\n}));\n\nreturn [utgaende];\n",
+    "outputs": 1,
+    "x": 900,
+    "y": 260,
+    "wires": [
+      [
+        "n_ws_out"
+      ]
+    ]
+  },
+  {
+    "id": "n_catch_2",
+    "type": "catch",
+    "z": "tab_val_realtid",
+    "name": "Fångar fel från HamtaValdata (pollning)",
+    "scope": [
+      "n_call_hamta_2"
+    ],
+    "uncaught": false,
+    "x": 640,
+    "y": 340,
+    "wires": [
+      [
+        "n_fn_logerr"
+      ]
+    ]
+  },
+  {
+    "id": "n_fn_logerr",
+    "type": "function",
+    "z": "tab_val_realtid",
+    "name": "Logga pollningsfel",
+    "func": "// Catch-nod för pollningsflödet: ett fel här (t.ex. val.se nere en kort\n// stund) ska aldrig krascha hela realtidsflödet - bara loggas. Nästa\n// pollningscykel försöker automatiskt igen.\nconst err = msg.error || {};\nnode.warn(\"Pollningsfel (ignoreras, försöker igen nästa cykel): \" + (err.message || JSON.stringify(err)));\nreturn null;\n",
+    "outputs": 1,
+    "x": 900,
+    "y": 340,
+    "wires": [
+      []
+    ]
+  },
+  {
+    "id": "n_ws_out",
+    "type": "websocket out",
+    "z": "tab_val_realtid",
+    "name": "WS out (/val/ws)",
+    "server": "cfg_ws_listener",
+    "client": "",
+    "x": 1140,
+    "y": 260,
+    "wires": []
+  }
+]

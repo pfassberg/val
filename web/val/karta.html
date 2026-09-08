@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="sv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Valresultat på karta</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .leaflet-popup-content { font-size: 0.85rem; min-width: 220px; }
+  .leaflet-popup-content table { width: 100%; border-collapse: collapse; }
+  .leaflet-popup-content td, .leaflet-popup-content th { padding: 2px 4px; }
+</style>
+</head>
+<body>
+<div class="map-page">
+  <div class="topbar">
+    <a class="back" href="#" id="backLink">&larr; Byt val</a>
+    <h1 id="pageTitle">Laddar…
+      <span class="sub" id="pageSubtitle"></span>
+    </h1>
+    <span class="badge" id="liveBadge" style="display:none"></span>
+    <span class="updated-at" id="updatedAt"></span>
+  </div>
+
+  <div id="map"></div>
+
+  <div class="error-banner" id="errorBanner"></div>
+
+  <div class="panel" id="listPanel">
+    <div class="panel-header">
+      <input type="text" id="listFilter" placeholder="Filtrera distrikt…">
+      <button class="toggle" id="panelToggle">Dölj</button>
+    </div>
+    <div class="panel-body">
+      <table class="district-list">
+        <thead>
+          <tr>
+            <th data-sort="namn">Distrikt</th>
+            <th data-sort="ledandeParti">Ledande</th>
+            <th data-sort="valdeltagande">Deltagande</th>
+          </tr>
+        </thead>
+        <tbody id="listBody"></tbody>
+      </table>
+    </div>
+    <div class="detail" id="detail">
+      <p class="placeholder">Klicka på ett distrikt i listan eller på kartan för att se detaljerat resultat.</p>
+    </div>
+  </div>
+</div>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="js/partycolors.js"></script>
+<script src="js/karta.js"></script>
+</body>
+</html>
