@@ -1,13 +1,33 @@
 # Node-RED – installation
 
-Flödet är helt självförsörjande: det öppnar sin egen HTTP- och
-WebSocket-lyssnare (`/val/*` och `/val/ws`) via kärnnoderna `http in`,
-`http response`, `websocket in`/`websocket out` – du behöver **inte** ändra
-`settings.js` eller konfigurera någon extern statisk filserver.
+Flödet öppnar sin egen HTTP- och WebSocket-lyssnare (`/val/*` och `/val/ws`)
+via kärnnoderna `http in`, `http response`, `websocket in`/`websocket out` –
+du behöver **inte** konfigurera någon extern statisk filserver. Du behöver
+dock göra **en liten, obligatorisk ändring i `settings.js`** (steg 0 nedan)
+eftersom Function-nodens sandbox inte har tillgång till Node.js
+kärnmoduler (`fs`, `path`) eller `require()` som standard.
 
 Kräver **Node.js 18 eller senare** (för global `fetch()` i funktionsnoderna
 – se avsnittet [Om Node.js-versionen är äldre](#om-nodejs-versionen-är-äldre-än-18)
 om det inte stämmer på din server).
+
+## 0. Ge funktionsnoderna tillgång till `fs`/`path` (obligatoriskt)
+
+Öppna din Node-RED `settings.js` (vanligen `~/.node-red/settings.js`) och
+lägg till (eller utöka om `functionGlobalContext` redan finns):
+
+```js
+functionGlobalContext: {
+    fs: require('fs'),
+    path: require('path')
+}
+```
+
+**Starta om Node-RED-processen** (t.ex. `sudo systemctl restart nodered`,
+eller motsvarande för hur du kör den) – det räcker **inte** med Deploy i
+editorn, `settings.js` läses bara in vid processstart. Utan detta steg
+kraschar noden "Global konfiguration + hjälpfunktioner" med
+`ReferenceError: require is not defined`.
 
 ## 1. Kopiera filer till servern
 
