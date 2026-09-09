@@ -1,4 +1,4 @@
-# Valresultat på karta – nr.fallberg.se/val
+# Valresultat på karta – nr.fassberg.se/val
 
 En realtidskarta över valresultat per valdistrikt i en valfri kommun, med
 jämförelse mot föregående val. Byggd med **Leaflet** (karta),
@@ -31,9 +31,10 @@ Innehåll i detta repo:
    ska ligga på servern, och (viktigast) hur du verifierar/justerar
    URL:erna mot val.se, se nästa avsnitt.
 2. Importera `node-red/flows-val.json` i Node-RED, kopiera `web/val/` och
-   `node-red/data/` till servern, justera två sökvägar i konfigurationsnoden
+   `node-red/data/` till servern (standard är under `/tmp/val-app/`, se
+   node-red/README.md), justera vid behov sökvägarna i konfigurationsnoden
    och tryck Deploy.
-3. Öppna `https://nr.fallberg.se/val/` och testa med 2022 vs 2018 (riksdag,
+3. Öppna `https://nr.fassberg.se/val/` och testa med 2022 vs 2018 (riksdag,
    region eller kommunval) för valfri kommun.
 
 ## ⚠️ Viktigt att veta innan du testar

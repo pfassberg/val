@@ -56,15 +56,20 @@ flows-val.json.
 
 ## 1. Kopiera filer till servern
 
-Lägg de två mapparna någonstans Node-RED-processen kan läsa (och skriva en
-cache-undermapp i), t.ex.:
+Standardsökvägarna i flödet ligger under `/tmp/val-app/` (funkar på i
+princip alla system, inklusive FreeBSD där det inte ens finns något `/opt`).
+Kopiera dit:
 
 ```
-/opt/nodered/val/data/     <- innehåll från repots node-red/data/
-/opt/nodered/val/web/val/  <- innehåll från repots web/val/
+/tmp/val-app/data/     <- innehåll från repots node-red/data/
+/tmp/val-app/web/val/  <- innehåll från repots web/val/
 ```
 
-(Vilka sökvägar du än väljer, notera dem – de anges i steg 3.)
+`/tmp/val-app/cache/` skapas automatiskt av flödet (behöver inte kopieras).
+
+Om du hellre vill lägga filerna på en mer varaktig plats (t.ex. om `/tmp`
+töms vid omstart av servern och du inte vill behöva kopiera om dem varje
+gång) går det förstås bra – notera då sökvägarna, de anges i steg 3.
 
 ## 2. Importera flödet
 
@@ -83,19 +88,19 @@ id-krockar). Du får två nya flikar:
 högst upp:
 
 ```js
-const DATA_DIR = "/opt/nodered/val/data";
-const WEB_ROOT = "/opt/nodered/val/web/val";
-const CACHE_DIR = "/tmp/val-cache";
+const DATA_DIR = "/tmp/val-app/data";
+const WEB_ROOT = "/tmp/val-app/web/val";
+const CACHE_DIR = "/tmp/val-app/cache";
 ```
 
-`DATA_DIR` och `WEB_ROOT` ska peka på sökvägarna du valde i steg 1 – de
-behöver bara vara **läsbara** för Node-RED-processen. `CACHE_DIR` måste
-däremot vara **skrivbar** (Node-RED laddar ner och cachar val.se-filer där);
-`/tmp/val-cache` funkar i de flesta miljöer, men om din server/container
-begränsar var processen får skriva (t.ex. nekar `/opt`), byt till en
-sökväg du vet är skrivbar. Cachen är bara en optimering – om katalogen
-töms vid omstart byggs den bara upp på nytt vid nästa hämtning, så det gör
-inget om den ligger under `/tmp`.
+Dessa tre matchar redan standardplatserna i steg 1 – bara att låta dem
+vara om du inte flyttat filerna någon annanstans. Ändra annars till dina
+egna sökvägar. `DATA_DIR`/`WEB_ROOT` behöver bara vara **läsbara**;
+`CACHE_DIR` måste vara **skrivbar** (Node-RED laddar ner och cachar
+val.se-filer där) – katalogen skapas automatiskt om den saknas. Cachen är
+bara en optimering, så det gör inget om `/tmp` töms vid en omstart: den
+byggs bara upp på nytt vid nästa hämtning. `DATA_DIR`/`WEB_ROOT` under
+`/tmp` däremot måste kopieras dit igen (steg 1) om `/tmp` töms.
 
 ## 4. Deploy
 
@@ -157,7 +162,7 @@ omprojicera och gruppera per kommun tar **~15 sekunder första gången**
 för hela Node-RED-processens livstid, så alla efterföljande anrop (oavsett
 kommun/valtyp) är i praktiken direkt snabba – tills processen startas om.
 
-Testa `https://nr.fallberg.se/val/api/valdistrikt?kommun=1488&ar=2022&valtyp=kommun`
+Testa `https://nr.fassberg.se/val/api/valdistrikt?kommun=1488&ar=2022&valtyp=kommun`
 (Trollhättan, samma exempel som verifierades) direkt i webbläsaren.
 
 ## 6. Om servern körs bakom en reverse proxy (nginx m.fl.)
