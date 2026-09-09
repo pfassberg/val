@@ -9,21 +9,22 @@ via Function-nodens egen **"Setup"-flik** – det är redan förifyllt i
 `flows-val.json` (nodernas `libs`-fält), du behöver inte fylla i något
 manuellt i editorn:
 
-- **Global konfiguration + hjälpfunktioner**: `fs`, `path`, `adm-zip`
-  (val.se:s filer är zip-arkiv) och `proj4` (konverterar kartkoordinater
-  från SWEREF99 TM till WGS84, se steg 5).
+- **Global konfiguration + hjälpfunktioner**: `fs`, `path`, `http`, `https`
+  (all hämtning från val.se sker med Node.js inbyggda http/https-moduler,
+  inte global `fetch()`, som saknas i vissa Node-RED/Node.js-miljöer),
+  `adm-zip` (val.se:s filer är zip-arkiv) och `proj4` (konverterar
+  kartkoordinater från SWEREF99 TM till WGS84, se steg 5).
 - **Servera statisk fil**: `fs`, `path`.
 - **Hämta, normalisera och jämför** (i subflowet `HamtaValdata`): `adm-zip`.
 
 Detta kräver dock **ett engångsflagg i `settings.js`** samt att `adm-zip`
-och `proj4` faktiskt är npm-installerade (steg 0 nedan) – `fs`/`path` är
-inbyggda i Node.js och kräver ingen installation, men de andra två är
+och `proj4` faktiskt är npm-installerade (steg 0 nedan) – `fs`/`path`/`http`/`https`
+är inbyggda i Node.js och kräver ingen installation, men de andra två är
 vanliga npm-paket som måste finnas i Node-RED:s `node_modules` för att
 Setup-fliken ska kunna ladda dem.
 
-Kräver **Node.js 18 eller senare** (för global `fetch()` i funktionsnoderna
-– se avsnittet [Om Node.js-versionen är äldre](#om-nodejs-versionen-är-äldre-än-18)
-om det inte stämmer på din server).
+Fungerar med i princip vilken Node.js-version som helst som Node-RED självt
+stödjer (ingen `fetch()`-version krävs).
 
 ## 0. Slå på `functionExternalModules` och installera npm-paket (obligatoriskt)
 
@@ -184,17 +185,6 @@ location /val/ {
 
 (Byt `1880` mot den port Node-RED faktiskt lyssnar på.)
 
-## Om Node.js-versionen är äldre än 18
-
-Funktionsnoderna använder global `fetch()`. Om `node -v` på servern visar
-under 18 finns två alternativ:
-
-- Enklast: uppgradera Node.js (Node-RED stödjer och rekommenderar aktiva
-  LTS-versioner).
-- Alternativt: byt ut `H.fetchJson(...)`-anropen i subflowet mot vanliga
-  `http request`-noder (dra in noden, sätt `url` till `msg.url`, `Return`
-  till *a parsed JSON object*, koppla in/ut runt anropen) – lite fler noder
-  men samma resultat.
 
 ## Justera utseendet
 
