@@ -39,11 +39,17 @@ Innehåll i detta repo:
 
 ## ⚠️ Viktigt att veta innan du testar
 
-**Både röster/mandat och kartgeometrin är verifierade end-to-end mot
-riktiga filer från val.se** och fungerar redan – ingen mer gissning:
+**Röster/mandat, kartgeometrin OCH jämförelsen mot föregående val (även
+2022 mot 2018, med olika format på de två åren) är verifierade end-to-end
+mot riktiga filer från val.se** och fungerar redan – ingen mer gissning:
 
-- Resultat: `Val_20220911_preliminar_1488_KF.zip` (kommunval Trollhättan
-  2022) → `valHelpers.resultatUrl()`.
+- Resultat 2022+: `Val_20220911_preliminar_1488_KF.zip` (kommunval
+  Trollhättan) → `valHelpers.resultatUrl()`.
+- Resultat 2018 och tidigare: `2018_K_per_valdistrikt.xlsx` (samma kommun) –
+  helt annat format (Excel från `historik.val.se`, inte zip/JSON) →
+  `valHelpers.historikUrl()`. Testat: 35 av 36 valdistrikt i Trollhättan
+  gick att jämföra 2022 mot 2018 (den enda som inte gick var ett distrikt
+  som inte fanns än 2018).
 - Karta: `valdistrikt-riket-2026.zip` (hela rikets valdistrikt, SWEREF99 TM
   → WGS84) → `valHelpers.geoIndexForYear()`.
 

@@ -12,16 +12,18 @@ manuellt i editorn:
 - **Global konfiguration + hjälpfunktioner**: `fs`, `path`, `http`, `https`
   (all hämtning från val.se sker med Node.js inbyggda http/https-moduler,
   inte global `fetch()`, som saknas i vissa Node-RED/Node.js-miljöer),
-  `adm-zip` (val.se:s filer är zip-arkiv) och `proj4` (konverterar
+  `adm-zip` (val.se:s filer 2022+ är zip-arkiv) och `proj4` (konverterar
   kartkoordinater från SWEREF99 TM till WGS84, se steg 5).
 - **Servera statisk fil**: `fs`, `path`.
-- **Hämta, normalisera och jämför** (i subflowet `HamtaValdata`): `adm-zip`.
+- **Hämta, normalisera och jämför** (i subflowet `HamtaValdata`): `adm-zip`
+  och `xlsx` (historik.val.se:s filer för 2018 och tidigare är
+  Excel-arbetsböcker, helt annat format än 2022+, se steg 5).
 
-Detta kräver dock **ett engångsflagg i `settings.js`** samt att `adm-zip`
-och `proj4` faktiskt är npm-installerade (steg 0 nedan) – `fs`/`path`/`http`/`https`
-är inbyggda i Node.js och kräver ingen installation, men de andra två är
-vanliga npm-paket som måste finnas i Node-RED:s `node_modules` för att
-Setup-fliken ska kunna ladda dem.
+Detta kräver dock **ett engångsflagg i `settings.js`** samt att `adm-zip`,
+`proj4` och `xlsx` faktiskt är npm-installerade (steg 0 nedan) –
+`fs`/`path`/`http`/`https` är inbyggda i Node.js och kräver ingen
+installation, men de tre andra är vanliga npm-paket som måste finnas i
+Node-RED:s `node_modules` för att Setup-fliken ska kunna ladda dem.
 
 Fungerar med i princip vilken Node.js-version som helst som Node-RED självt
 stödjer (ingen `fetch()`-version krävs).
@@ -35,12 +37,12 @@ lägg till:
 functionExternalModules: true,
 ```
 
-Installera sedan `adm-zip` och `proj4` i samma katalog som `settings.js`
-ligger i (Node-RED:s userDir, vanligen `~/.node-red`):
+Installera sedan `adm-zip`, `proj4` och `xlsx` i samma katalog som
+`settings.js` ligger i (Node-RED:s userDir, vanligen `~/.node-red`):
 
 ```sh
 cd ~/.node-red
-npm install adm-zip proj4
+npm install adm-zip proj4 xlsx
 ```
 
 **Starta om Node-RED-processen** (t.ex. `sudo systemctl restart nodered`,
@@ -48,7 +50,7 @@ eller motsvarande för hur du kör den) – det räcker **inte** med Deploy i
 editorn, `settings.js` läses bara in vid processstart. Utan flaggan vägrar
 Node-RED ladda modulerna som noderna begär via sin Setup-flik; utan
 `npm install` hittar den inte paketen alls. Bägge ger fel i stil med att
-`fs`/`path`/`AdmZip`/`proj4` inte är definierade.
+`fs`/`path`/`AdmZip`/`proj4`/`XLSX` inte är definierade.
 
 Om du vill se/ändra det i editorn istället för att lita på det importerade
 flödet: öppna någon av noderna → fliken **Setup** → där listas redan de
@@ -112,20 +114,20 @@ sökvägarna i steg 3 faktiskt existerar och är läsbara.
 
 ## 5. Resultat- och geometri-URL:erna är verifierade
 
-**Både röster och karta är testade end-to-end mot riktiga filer** från
-val.se (kommunval Trollhättan 2022, plus den nationella
-`valdistrikt-riket-2026.zip`) – se `node-red/README.md`-historiken/committarna
-om du vill se exakt vilka exempel. Du bör alltså kunna testa direkt utan
-fler ändringar. Så här hänger det ihop:
+**Röster, jämförelselogik och karta är alla testade end-to-end mot riktiga
+filer** från val.se (kommunval Trollhättan, både 2022 och 2018, plus den
+nationella `valdistrikt-riket-2026.zip`). Du bör alltså kunna testa direkt
+utan fler ändringar. Så här hänger det ihop:
 
-**Resultat** (röster/mandat per parti):
+**Resultat, 2022 och senare** (röster/mandat per parti) – `resultat.val.se`,
+zip-arkiv med JSON:
 
 ```
 https://resultat.val.se/resultatfiler/val{ÅR}/{p|s}/{kf|rf|rd}/
     Val_{ÅÅÅÅMMDD}_{preliminar|slutlig}_{KOD}_{KF|RF|RD}.zip
 ```
 
-`p`/`s` = preliminär (levande år, pollas) resp. slutlig (facit, 2018/2022).
+`p`/`s` = preliminär (levande år, pollas) resp. slutlig (facit, 2022+).
 `kf` = kommunval (KOD = 4-siffrig kommunkod), `rf` = regionval (KOD =
 2-siffrig länskod, en fil täcker alltså flera kommuner), `rd` = riksdagsval
 (KOD alltid `"00"`, EN fil för hela landet). Zip:en innehåller
@@ -133,6 +135,25 @@ https://resultat.val.se/resultatfiler/val{ÅR}/{p|s}/{kf|rf|rd}/
 använder) och `..._mandatfordelning_..._.json` (mandat per kommun/valkrets,
 inte per valdistrikt – används inte i kartan just nu). Inbyggt i
 `valHelpers.resultatUrl()` / `electionDateSweden()`.
+
+**Resultat, 2018 och tidigare** (`historikCutoffAr` = 2022) – helt annan
+källa och helt annat format: `historik.val.se`, en Excel-arbetsbok per
+valtyp och år, inte zip/JSON:
+
+```
+https://historik.val.se/val/val{ÅR}/statistik/{ÅR}_{K|L|R}_per_valdistrikt.xlsx
+```
+
+`K` = kommunval, `L` = region (hette "landsting" då), `R` = riksdag.
+Arbetsboken har flikarna `"{K|L|R} antal"` (röster) och `"{K|L|R} procent"`
+(andelar, radordning matchar `antal`-fliken) – en rad per valdistrikt, en
+kolumn per parti. **Viktigt:** den här filens `VALDISTRIKTSKOD`-kolumn är
+bara ett suffix (t.ex. `106`), inte samma 8-siffriga kod som i 2022+-filerna
+(`14880106`) – `hamtaOchNormaliseraHistorik()` i "Hämta, normalisera och
+jämför" återskapar samma kod (kommunkod + suffixet nollutfyllt till 4
+siffror, verifierat mot både 2022 års resultat och 2026 års karta) så att
+jämförelsen (`jamforbar`) fungerar över åren. Inbyggt i
+`valHelpers.historikUrl()`.
 
 **Geometri** (valdistriktens kartutbredning): till skillnad från
 resultatfilerna ovan är detta INTE en förutsägbar URL-mall – det är en
