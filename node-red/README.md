@@ -4,25 +4,28 @@ Flödet öppnar sin egen HTTP- och WebSocket-lyssnare (`/val/*` och `/val/ws`)
 via kärnnoderna `http in`, `http response`, `websocket in`/`websocket out` –
 du behöver **inte** konfigurera någon extern statisk filserver. Function-nodens
 sandbox har dock inte tillgång till Node.js kärnmoduler (`fs`, `path`) eller
-`require()` som standard, så de noder som behöver dem (`Global konfiguration
-+ hjälpfunktioner`, `Servera statisk fil`, och `Hämta, normalisera och
-jämför` i subflowet `HamtaValdata`, som även laddar zip-biblioteket
-`adm-zip` – val.se:s resultatfiler är zip-arkiv) laddar sina moduler via
-Function-nodens egen **"Setup"-flik** – det är redan förifyllt i
+`require()` som standard, så de noder som behöver dem laddar sina moduler
+via Function-nodens egen **"Setup"-flik** – det är redan förifyllt i
 `flows-val.json` (nodernas `libs`-fält), du behöver inte fylla i något
-manuellt i editorn.
+manuellt i editorn:
+
+- **Global konfiguration + hjälpfunktioner**: `fs`, `path`, `adm-zip`
+  (val.se:s filer är zip-arkiv) och `proj4` (konverterar kartkoordinater
+  från SWEREF99 TM till WGS84, se steg 5).
+- **Servera statisk fil**: `fs`, `path`.
+- **Hämta, normalisera och jämför** (i subflowet `HamtaValdata`): `adm-zip`.
 
 Detta kräver dock **ett engångsflagg i `settings.js`** samt att `adm-zip`
-faktiskt är npm-installerat (steg 0 nedan) – `fs`/`path` är inbyggda i
-Node.js och kräver ingen installation, men `adm-zip` är ett vanligt
-npm-paket som måste finnas i Node-RED:s `node_modules` för att Setup-fliken
-ska kunna ladda det.
+och `proj4` faktiskt är npm-installerade (steg 0 nedan) – `fs`/`path` är
+inbyggda i Node.js och kräver ingen installation, men de andra två är
+vanliga npm-paket som måste finnas i Node-RED:s `node_modules` för att
+Setup-fliken ska kunna ladda dem.
 
 Kräver **Node.js 18 eller senare** (för global `fetch()` i funktionsnoderna
 – se avsnittet [Om Node.js-versionen är äldre](#om-nodejs-versionen-är-äldre-än-18)
 om det inte stämmer på din server).
 
-## 0. Slå på `functionExternalModules` och installera `adm-zip` (obligatoriskt)
+## 0. Slå på `functionExternalModules` och installera npm-paket (obligatoriskt)
 
 Öppna din Node-RED `settings.js` (vanligen `~/.node-red/settings.js`) och
 lägg till:
@@ -31,20 +34,20 @@ lägg till:
 functionExternalModules: true,
 ```
 
-Installera sedan `adm-zip` i samma katalog som `settings.js` ligger i
-(Node-RED:s userDir, vanligen `~/.node-red`):
+Installera sedan `adm-zip` och `proj4` i samma katalog som `settings.js`
+ligger i (Node-RED:s userDir, vanligen `~/.node-red`):
 
 ```sh
 cd ~/.node-red
-npm install adm-zip
+npm install adm-zip proj4
 ```
 
 **Starta om Node-RED-processen** (t.ex. `sudo systemctl restart nodered`,
 eller motsvarande för hur du kör den) – det räcker **inte** med Deploy i
 editorn, `settings.js` läses bara in vid processstart. Utan flaggan vägrar
 Node-RED ladda modulerna som noderna begär via sin Setup-flik; utan
-`npm install adm-zip` hittar den inte paketet alls. Bägge ger fel i stil
-med att `fs`/`path`/`AdmZip` inte är definierade.
+`npm install` hittar den inte paketen alls. Bägge ger fel i stil med att
+`fs`/`path`/`AdmZip`/`proj4` inte är definierade.
 
 Om du vill se/ändra det i editorn istället för att lita på det importerade
 flödet: öppna någon av noderna → fliken **Setup** → där listas redan de
@@ -101,10 +104,15 @@ och skriver ut `val-karta: konfiguration och hjälpfunktioner initierade.` i
 Node-RED-loggen/debug-fönstret. Om du inte ser det raden, kolla att
 sökvägarna i steg 3 faktiskt existerar och är läsbara.
 
-## 5. Resultat-URL:erna är verifierade – geometrin (kartan) återstår
+## 5. Resultat- och geometri-URL:erna är verifierade
 
-**Röster/mandat är klart och testat mot en riktig fil** (kommunval
-Trollhättan 2022). URL-strukturen är:
+**Både röster och karta är testade end-to-end mot riktiga filer** från
+val.se (kommunval Trollhättan 2022, plus den nationella
+`valdistrikt-riket-2026.zip`) – se `node-red/README.md`-historiken/committarna
+om du vill se exakt vilka exempel. Du bör alltså kunna testa direkt utan
+fler ändringar. Så här hänger det ihop:
+
+**Resultat** (röster/mandat per parti):
 
 ```
 https://resultat.val.se/resultatfiler/val{ÅR}/{p|s}/{kf|rf|rd}/
@@ -117,40 +125,40 @@ https://resultat.val.se/resultatfiler/val{ÅR}/{p|s}/{kf|rf|rd}/
 (KOD alltid `"00"`, EN fil för hela landet). Zip:en innehåller
 `..._rostfordelning_..._.json` (röster per **valdistrikt**, det vi
 använder) och `..._mandatfordelning_..._.json` (mandat per kommun/valkrets,
-inte per valdistrikt – används inte i kartan just nu). Allt detta ligger
-redan i `valHelpers.resultatUrl()` / `electionDateSweden()` i noden
-**"Global konfiguration + hjälpfunktioner"**, och tolkningen i subflowet
-**HamtaValdata** → funktionsnoden **"Hämta, normalisera och jämför"**.
+inte per valdistrikt – används inte i kartan just nu). Inbyggt i
+`valHelpers.resultatUrl()` / `electionDateSweden()`.
 
-**Det som fortfarande saknas är geometrin** – valdistriktens
-kartutbredning (polygoner) ligger inte i resultatfilerna ovan. `urls.geo` i
-"Global konfiguration + hjälpfunktioner" är fortfarande en placeholder:
+**Geometri** (valdistriktens kartutbredning): till skillnad från
+resultatfilerna ovan är detta INTE en förutsägbar URL-mall – det är en
+CMS-genererad nedladdningslänk från val.se (asset-ID + tidsstämpel i
+URL:en). Den ligger därför i en enkel lista, en rad per år, i noden
+**"Global konfiguration + hjälpfunktioner"**:
 
 ```js
-const urls = {
-    geo: "https://www.val.se/PLACEHOLDER-VERIFIERA/geodata/{ar}/{lan_kod}.json"
+const geoUrls = {
+    2026: "https://www.val.se/download/18.332cf48819bd61ac1513889/1785491689960/valdistrikt-riket-2026.zip"
 };
 ```
 
-Så här hittar du den (samma teknik som gav oss resultat-URL:erna ovan):
-sök på val.se:s sida *Statistik och data* efter valdistriktens
-gränser/kartor (nämns där som GeoJSON i SWEREF99 TM, en fil per
-län/region), eller leta efter en `index.md5`-liknande fil under
-`resultat.val.se` eller en annan del av val.se. Uppdatera sedan `urls.geo`
-(`{ar}`/`{lan_kod}` byts ut automatiskt) och, om fältnamnen i den filen
-inte matchar, `pickField`-kandidaterna för geometrin i "Hämta, normalisera
-och jämför" (sök på `distriktskod` i den funktionen – felmeddelandet
-listar de faktiska fältnamnen om det inte hittar rätt).
+Filen är EN geojson för hela riket (samma geometri gäller alla tre
+valtyper), i SWEREF99 TM – konverteras automatiskt till WGS84
+(`valHelpers.geoIndexForYear()`, med `proj4`). Om du hittar/laddar ner
+motsvarande fil för fler år (t.ex. 2022 eller 2018 – sök på val.se:s sida
+*Statistik och data* efter valdistriktens gränser/kartor, eller skicka
+filen hit), lägg bara till en rad till i `geoUrls`. **Saknas ett år helt
+används automatiskt närmaste tillgängliga år istället** (distriktsgränser
+ändras sällan mellan val) – det syns då som en varning i `meta.varningar`
+i API-svaret, så det är tydligt i gränssnittet att gränserna kan skilja sig
+något.
 
-Fram tills dess svarar `/val/api/valdistrikt` med en tydlig varning
-(`meta.varningar`) och en tom karta, men **listan och alla siffror fungerar
-redan** eftersom uppsamlingsdistrikt (och i praktiken alla distrikt, tills
-geometrin finns) hamnar i `uppsamlingsdistrikt`-listan när ingen matchande
-geometri hittas.
+Den nationella geo-filen är ~100 MB och ~6300 distrikt – att läsa in,
+omprojicera och gruppera per kommun tar **~15 sekunder första gången**
+(loggas som `node.warn` i debug-fönstret). Resultatet cachas sedan i minnet
+för hela Node-RED-processens livstid, så alla efterföljande anrop (oavsett
+kommun/valtyp) är i praktiken direkt snabba – tills processen startas om.
 
 Testa `https://nr.fallberg.se/val/api/valdistrikt?kommun=1488&ar=2022&valtyp=kommun`
-(Trollhättan, samma exempel som verifierades) direkt i webbläsaren för att se
-resultatet redan nu.
+(Trollhättan, samma exempel som verifierades) direkt i webbläsaren.
 
 ## 6. Om servern körs bakom en reverse proxy (nginx m.fl.)
 

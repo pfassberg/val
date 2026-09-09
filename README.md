@@ -38,18 +38,21 @@ Innehåll i detta repo:
 
 ## ⚠️ Viktigt att veta innan du testar
 
-**Röster, mandat och jämförelselogiken är verifierade mot en riktig fil**
-från val.se (kommunval Trollhättan 2022 – `Val_20220911_preliminar_1488_KF.zip`)
-och fungerar redan. URL-strukturen för resultatfilerna
-(`https://resultat.val.se/resultatfiler/val{ÅR}/{p|s}/{kf|rf|rd}/...zip`)
-är inbyggd i `valHelpers.resultatUrl()`.
+**Både röster/mandat och kartgeometrin är verifierade end-to-end mot
+riktiga filer från val.se** och fungerar redan – ingen mer gissning:
 
-Det som **fortfarande saknas** är geometrin (valdistriktens kartutbredning) –
-den ligger inte i resultatfilerna, och `urls.geo` i `node-red/flows-val.json`
-→ funktionsnoden **"Global konfiguration + hjälpfunktioner"** är fortfarande
-en placeholder. Utan den visas listan (med alla riktiga siffror) men ingen
-karta. Steg-för-steg för hur du hittar och fyller i den finns i
-[node-red/README.md](node-red/README.md#5-resultat-urlerna-är-verifierade--geometrin-kartan-återstår).
+- Resultat: `Val_20220911_preliminar_1488_KF.zip` (kommunval Trollhättan
+  2022) → `valHelpers.resultatUrl()`.
+- Karta: `valdistrikt-riket-2026.zip` (hela rikets valdistrikt, SWEREF99 TM
+  → WGS84) → `valHelpers.geoIndexForYear()`.
+
+Enda saken att känna till: geometrin är bara inlagd för **2026** just nu
+(`geoUrls` i noden "Global konfiguration + hjälpfunktioner" i
+`node-red/flows-val.json`) – för andra år (2018, 2022, ...) används
+2026-års distriktsgränser som fallback (de ändras sällan mellan val), vilket
+flaggas som en varning i gränssnittet. Lägg till fler år i `geoUrls` om du
+hittar/laddar ner motsvarande fil. Detaljer i
+[node-red/README.md](node-red/README.md#5-resultat--och-geometri-urlerna-är-verifierade).
 
 ## Funktioner
 
